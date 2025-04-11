@@ -38,7 +38,6 @@ Imports:
     tidyr,
     atlantisom,
     atlantistools,
-    atlantisprocessing,
     rlang,
     rbgm,
     data.table,
@@ -56,7 +55,6 @@ Imports:
     tibble
 Remotes:
     Atlantis-Ecosystem-Model/atlantistools,
-    NOAA-EDAB/atlantisprocessing
     r4atlantis/atlantisom
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
