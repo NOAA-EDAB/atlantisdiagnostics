@@ -26,7 +26,7 @@ Description: Atlantis diagnostics functions in this package are used to determin
     is meeting defined performance and review criteria. Processing functions are used to format the model output for 
     plotting and diagnostic tests
 License: file LICENSE
-URL: https://github.com/NOAA-EDAB/atlantisdiagnostics
+URL: https://github.com/NOAA-EDAB/atlantisdiagnostics,https://noaa-edab.github.io/atlantisdiagnostics/
 BugReports: https://github.com/NOAA-EDAB/atlantisdiagnostics/issues
 Encoding: UTF-8
 LazyData: true
