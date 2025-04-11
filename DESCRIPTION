@@ -1,5 +1,5 @@
 Package: atlantisdiagnostics
-Title: Implements Atlantis Model Performance Diagnostics Outlined in Kaplan and Marshall 2016
+Title: Process Atlantis model output and implements model performance diagnostics 
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Sarah",
@@ -22,15 +22,9 @@ Authors@R:
     person(given = "Ryan",family = "Morse", role = c("aut"),
            email = "ryan.morse@noaa.gov",
            comment = c(ORCID = "YOUR-ORCID-ID")))
-
 Description: Atlantis diagnostics functions in this package are used to determine whether the model 
-    is meeting defined performance and review criteria, including persistence of all functional groups,
-    biomass stability for the last ~20 years of a run, species groups 
-    totaling ~80% of system biomass qualitatively matching known biomass trends, patterns of temporal 
-    variability are captured, productivity for groups totaling ~80% of system biomass qualitatively 
-    matching FMSY or life history expectations, natural mortality decreasing with age for most groups,
-    age and length structure qualitatively matching expectations for majority of groups, and predicted
-    diet qualitatively matching empirical diet comp for majority of groups.
+    is meeting defined performance and review criteria. Processing functions are used to format the model output for 
+    plotting and diagnostic tests
 License: file LICENSE
 URL: https://github.com/NOAA-EDAB/atlantisdiagnostics
 BugReports: https://github.com/NOAA-EDAB/atlantisdiagnostics/issues
@@ -58,11 +52,11 @@ Imports:
     RNetCDF,
     reshape2,
     gtable,
-    ggpubr
+    ggpubr,
     tibble
 Remotes:
     Atlantis-Ecosystem-Model/atlantistools,
     NOAA-EDAB/atlantisprocessing
     r4atlantis/atlantisom
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
