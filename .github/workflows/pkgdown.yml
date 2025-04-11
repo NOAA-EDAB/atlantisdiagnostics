@@ -3,8 +3,8 @@ name: gh-pages
 on:
   push:
     branches:
-      - main
-      - master
+      - zmain
+      - zmaster
 
 
 jobs:
