@@ -1,28 +1,53 @@
-Package: atlantisprocessing
-Title: Process and plot Atlantis output
+Package: atlantisdiagnostics
+Title: Implements Atlantis Model Performance Diagnostics Outlined in Kaplan and Marshall 2016
 Version: 0.0.0.9000
 Authors@R: 
-    c(person("Joseph", "Caracappa", role = c("aut"),
-          email= "joseph.caracappa@noaa.gov", 
-          comment = c(ORCID = "YOUR-ORCID-ID")),
-      person(given = "Andy",family = "Beet", role = c("aut", "cre"),
+    c(person(given = "Sarah",
+           family = "Gaichas",
+           role = c("aut"),
+           email = "Sarah.Gaichas@noaa.gov"),
+    person(given = "Andy",
+           family = "Beet",
+           role = c("aut", "cre"),
            email = "andrew.beet@noaa.gov",
            comment = c(ORCID = "0000-0001-8270-7090")),
-      person(given = "Ryan",family = "Morse", role = c("aut"),
+    person(given = "Joeseph",
+           family = "Caracappa",
+           role = c("aut"),
+           email = "joseph.caracappa@noaa.gov"),
+    person(given = "Robert",
+           family = "Gamble",
+           role = c("aut"),
+           email = "Robert.Gamble@noaa.gov"),
+    person(given = "Ryan",family = "Morse", role = c("aut"),
            email = "ryan.morse@noaa.gov",
            comment = c(ORCID = "YOUR-ORCID-ID")))
-Description: Reads in Atlantis output files (nc, txt) and processes content
+
+Description: Atlantis diagnostics functions in this package are used to determine whether the model 
+    is meeting defined performance and review criteria, including persistence of all functional groups,
+    biomass stability for the last ~20 years of a run, species groups 
+    totaling ~80% of system biomass qualitatively matching known biomass trends, patterns of temporal 
+    variability are captured, productivity for groups totaling ~80% of system biomass qualitatively 
+    matching FMSY or life history expectations, natural mortality decreasing with age for most groups,
+    age and length structure qualitatively matching expectations for majority of groups, and predicted
+    diet qualitatively matching empirical diet comp for majority of groups.
 License: file LICENSE
+URL: https://github.com/NOAA-EDAB/atlantisdiagnostics
+BugReports: https://github.com/NOAA-EDAB/atlantisdiagnostics/issues
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
-Imports: 
-    atlantisom,
-    atlantistools,
-    rbgm,
-    data.table,
+LazyData: true
+Imports:
     dplyr,
     ggplot2,
+    magrittr,
+    purrr,
+    tidyr,
+    atlantisom,
+    atlantistools,
+    atlantisprocessing,
+    rlang,
+    rbgm,
+    data.table,
     grid,
     gridExtra,
     lazyeval,
@@ -31,12 +56,13 @@ Imports:
     here,
     ncdf4,
     RNetCDF,
-    tidyr,
-    magrittr,
     reshape2,
     gtable,
     ggpubr
+    tibble
 Remotes:
-   Atlantis-Ecosystem-Model/atlantistools,
-   r4atlantis/atlantisom
-   
+    Atlantis-Ecosystem-Model/atlantistools,
+    NOAA-EDAB/atlantisprocessing
+    r4atlantis/atlantisom
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1

@@ -5,3 +5,8 @@
 ^\.github$
 docs
 other
+^LICENSE\.md$
+pkgdown
+docs
+test
+^\.github$
