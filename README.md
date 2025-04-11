@@ -8,7 +8,9 @@
 <!-- badges: end -->
 In development.
 
-Atlantis model performance diagnostics guided by Kaplan and Marshall<sup>1</sup>, 2016
+Tools for processing Atlantis model output.
+  * Plotting and summarizing Atlantis model output
+  * Performance diagnostics for Atlantis model output (guided by Kaplan and Marshall<sup>1</sup>, 2016)
 
 ## Installation
 
@@ -16,13 +18,22 @@ Atlantis model performance diagnostics guided by Kaplan and Marshall<sup>1</sup>
 remotes::install_github("NOAA-EDAB/atlantisdiagnostics")
 ```
 
+or
+
+``` r
+pak::pak("NOAA-EDAB/atlantisdiagnostics")
+```
+
 ## Usage
 
-The diagnostics package primarily focuses on three properties of an Atlantis model. These are loosely defined as persistence, stability, and reasonability.
+The diagnostics package primarily focuses on two aspects.
 
-* Persistence: Do all species/groups in the model persist through a set period of time?
-* Stability: Do all species/groups reach an acceptable steady state or equilibrium?
-* Reasonability: Do all species/groups population biomass lie within reasonable bounds?
+  * Processing and plotting a suite of model properties
+  * Performance diagnostics to quickly identify potential issues, for example:
+  
+      * Persistence: Do all species/groups in the model persist through a set period of time?
+      * Stability: Do all species/groups reach an acceptable steady state or equilibrium?
+      * Reasonability: Do all species/groups population biomass lie within reasonable bounds?
 
 
 <sup>1</sup> [A guinea pig's tale](https://doi.org/10.1093/icesjms/fsw047): learning to review end-to-end marine ecosystem models for management application. ICES Journal of Marine Science (2016) 73(7), 1715-1724
@@ -34,7 +45,7 @@ Members of the Atlantis team in alphabetical order:
 
 | [andybeet](https://github.com/andybeet) | [jcaracappa1](https://github.com/jcaracappa1) | [sgaichas](https://github.com/sgaichas) | [gambler1650](https://github.com/gambler1650) | [slarge](https://github.com/slarge) | [RMORSEcode](https://github.com/RMORSEcode) |
 |---|---|---|---|---|---|
-| [![](https://avatars1.githubusercontent.com/u/22455149?s=100&v=4)](https://github.com/andybeet) | [![](https://avatars1.githubusercontent.com/u/57966543?s=100&v=4)](https://github.com/jcaracappa1) | [![](https://avatars1.githubusercontent.com/u/8172302?s=100&v=4)](https://github.com/sgaichas) | [![](https://avatars1.githubusercontent.com/u/5949383?s=100&v=4)](https://github.com/gambler1650) | [![](https://avatars1.githubusercontent.com/u/5000131?s=100&v=4)](https://github.com/slarge) | [![](https://avatars1.githubusercontent.com/u/10620840?s=100&v=4)](https://github.com/RMORSEcode) |
+| [![andybeet avatar](https://avatars1.githubusercontent.com/u/22455149?s=100&v=4)](https://github.com/andybeet) | [![jcaracappa1 avatar](https://avatars1.githubusercontent.com/u/57966543?s=100&v=4)](https://github.com/jcaracappa1) | [![sgaichas avatar](https://avatars1.githubusercontent.com/u/8172302?s=100&v=4)](https://github.com/sgaichas) | [![andybeet avatar](https://avatars1.githubusercontent.com/u/5949383?s=100&v=4)](https://github.com/gambler1650) | [![slarge avatar](https://avatars1.githubusercontent.com/u/5000131?s=100&v=4)](https://github.com/slarge) | [![RMORSEcode avatar](https://avatars1.githubusercontent.com/u/10620840?s=100&v=4)](https://github.com/RMORSEcode) |
 
 
 
