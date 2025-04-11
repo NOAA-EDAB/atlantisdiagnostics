@@ -3,6 +3,7 @@
 <url><loc>/LICENSE-text.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/reference/compare_spatial_vars.html</loc></url>
 <url><loc>/reference/diag_cohortBiomass.html</loc></url>
 <url><loc>/reference/diag_combine.html</loc></url>
 <url><loc>/reference/diag_fleet_catch.html</loc></url>
@@ -10,6 +11,10 @@
 <url><loc>/reference/diag_persistence.html</loc></url>
 <url><loc>/reference/diag_reasonability.html</loc></url>
 <url><loc>/reference/diag_stability.html</loc></url>
+<url><loc>/reference/get_atl_paramfiles.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/make_atlantis_diagnostic_figures.html</loc></url>
+<url><loc>/reference/process_atl_output.html</loc></url>
+<url><loc>/reference/process_catch_fleet.html</loc></url>
 </urlset>
 
