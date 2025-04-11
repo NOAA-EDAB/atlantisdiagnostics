@@ -46,7 +46,7 @@ diag_fleet_catch <- function(fgs,
   boxes = atlantistools::convert_bgm(bgm)%>%
     dplyr::distinct(polygon,inside_lat,inside_long)
 
-  catch.fleet =atlantisprocessing::process_catch_fleet(fishery.prm = fishery.prm,
+  catch.fleet =process_catch_fleet(fishery.prm = fishery.prm,
                                           catch = catch.file,
                                           groups.file = fgs)
 
