@@ -6,11 +6,21 @@
 [![pkgdown](https://github.com/NOAA-EDAB/atlantisdiagnostics/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/NOAA-EDAB/atlantisdiagnostics/actions/workflows/pkgdown.yaml) [![R-CMD-check](https://github.com/NOAA-EDAB/atlantisdiagnostics/workflows/R-CMD-check/badge.svg)](https://github.com/NOAA-EDAB/atlantisdiagnostics/actions)
 
 <!-- badges: end -->
-In development.
 
-Tools for processing Atlantis model output.
-  * Plotting and summarizing Atlantis model output
-  * Performance diagnostics for Atlantis model output (guided by Kaplan and Marshall<sup>1</sup>, 2016)
+The diagnostics package primarily focuses on two aspects:
+
+  * Processing and plotting a suite of model properties
+  * Performance diagnostics (guided by Kaplan and Marshall<sup>1</sup>, 2016) to quickly identify potential issues, for example:
+  
+      * Persistence: Do all species/groups in the model persist through a set period of time?
+      * Stability: Do all species/groups reach an acceptable steady state or equilibrium?
+      * Reasonability: Do all species/groups population biomass lie within reasonable bounds?
+
+
+<sup>1</sup> [A guinea pig's tale](https://doi.org/10.1093/icesjms/fsw047): learning to review end-to-end marine ecosystem models for management application. ICES Journal of Marine Science (2016) 73(7), 1715-1724
+
+
+
 
 ## Installation
 
@@ -23,21 +33,6 @@ or
 ``` r
 pak::pak("NOAA-EDAB/atlantisdiagnostics")
 ```
-
-## Usage
-
-The diagnostics package primarily focuses on two aspects.
-
-  * Processing and plotting a suite of model properties
-  * Performance diagnostics to quickly identify potential issues, for example:
-  
-      * Persistence: Do all species/groups in the model persist through a set period of time?
-      * Stability: Do all species/groups reach an acceptable steady state or equilibrium?
-      * Reasonability: Do all species/groups population biomass lie within reasonable bounds?
-
-
-<sup>1</sup> [A guinea pig's tale](https://doi.org/10.1093/icesjms/fsw047): learning to review end-to-end marine ecosystem models for management application. ICES Journal of Marine Science (2016) 73(7), 1715-1724
-
 
 ### Team members
 
