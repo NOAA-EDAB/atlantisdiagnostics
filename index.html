@@ -4,87 +4,87 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Process Atlantis model output and implements model performance diagnostics • atlantisdiagnostics</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
-<script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="Process Atlantis model output and implements model performance diagnostics">
+<meta name="description" content="Atlantis diagnostics functions in this package are used to determine whether the model is meeting defined performance and review criteria. Processing functions are used to format the model output for plotting and diagnostic tests">
 <meta property="og:description" content="Atlantis diagnostics functions in this package are used to determine whether the model is meeting defined performance and review criteria. Processing functions are used to format the model output for plotting and diagnostic tests">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc">
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <div class="container template-home">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">atlantisdiagnostics</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
-      </span>
-    </div>
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="reference/index.html">Reference</a>
+    <a class="navbar-brand me-2" href="index.html">atlantisdiagnostics</a>
+
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-3">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-help" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Help</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-help">
+<li><a class="dropdown-item" href="articles/processing.html">Processing model output</a></li>
+    <li><a class="dropdown-item" href="articles/plotting.html">Plotting model output</a></li>
+    <li><a class="dropdown-item" href="articles/diagnostics.html">Model diagnostics</a></li>
+  </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/NOAA-EDAB/atlantisdiagnostics/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
-
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/NOAA-EDAB/atlantisdiagnostics/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
-<!--/.nav-collapse -->
+
+
   </div>
-<!--/.container -->
-</div>
-<!--/.navbar -->
-
-
-
-      </header><div class="row">
-  <div class="contents col-md-9">
-<div class="section level1">
+</nav><div class="container template-home">
+<div class="row">
+  <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="atlantisdiagnostics">atlantisdiagnostics<a class="anchor" aria-label="anchor" href="#atlantisdiagnostics"></a>
 </h1></div>
 <!-- badges: start -->
 
 <!-- badges: end -->
 <p>In development.</p>
-<p>Atlantis model performance diagnostics guided by Kaplan and Marshall<sup>1</sup>, 2016</p>
+<p>Tools for processing Atlantis model output. * Plotting and summarizing Atlantis model output * Performance diagnostics for Atlantis model output (guided by Kaplan and Marshall<sup>1</sup>, 2016)</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"NOAA-EDAB/atlantisdiagnostics"</span><span class="op">)</span></span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"NOAA-EDAB/atlantisdiagnostics"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>The diagnostics package primarily focuses on three properties of an Atlantis model. These are loosely defined as persistence, stability, and reasonability.</p>
+<p>The diagnostics package primarily focuses on two aspects.</p>
+<ul>
+<li><p>Processing and plotting a suite of model properties</p></li>
+<li>
+<p>Performance diagnostics to quickly identify potential issues, for example:</p>
 <ul>
 <li>Persistence: Do all species/groups in the model persist through a set period of time?</li>
 <li>Stability: Do all species/groups reach an acceptable steady state or equilibrium?</li>
 <li>Reasonability: Do all species/groups population biomass lie within reasonable bounds?</li>
+</ul>
+</li>
 </ul>
 <p><sup>1</sup><a href="https://doi.org/10.1093/icesjms/fsw047" class="external-link">A guinea pig’s tale</a>: learning to review end-to-end marine ecosystem models for management application. ICES Journal of Marine Science (2016) 73(7), 1715-1724</p>
 <div class="section level3">
@@ -109,12 +109,12 @@
 <th><a href="https://github.com/RMORSEcode" class="external-link">RMORSEcode</a></th>
 </tr></thead>
 <tbody><tr class="odd">
-<td><a href="https://github.com/andybeet" class="external-link"><img src="https://avatars1.githubusercontent.com/u/22455149?s=100&amp;v=4"></a></td>
-<td><a href="https://github.com/jcaracappa1" class="external-link"><img src="https://avatars1.githubusercontent.com/u/57966543?s=100&amp;v=4"></a></td>
-<td><a href="https://github.com/sgaichas" class="external-link"><img src="https://avatars1.githubusercontent.com/u/8172302?s=100&amp;v=4"></a></td>
-<td><a href="https://github.com/gambler1650" class="external-link"><img src="https://avatars1.githubusercontent.com/u/5949383?s=100&amp;v=4"></a></td>
-<td><a href="https://github.com/slarge" class="external-link"><img src="https://avatars1.githubusercontent.com/u/5000131?s=100&amp;v=4"></a></td>
-<td><a href="https://github.com/RMORSEcode" class="external-link"><img src="https://avatars1.githubusercontent.com/u/10620840?s=100&amp;v=4"></a></td>
+<td><a href="https://github.com/andybeet" class="external-link"><img src="https://avatars1.githubusercontent.com/u/22455149?s=100&amp;v=4" alt="andybeet avatar"></a></td>
+<td><a href="https://github.com/jcaracappa1" class="external-link"><img src="https://avatars1.githubusercontent.com/u/57966543?s=100&amp;v=4" alt="jcaracappa1 avatar"></a></td>
+<td><a href="https://github.com/sgaichas" class="external-link"><img src="https://avatars1.githubusercontent.com/u/8172302?s=100&amp;v=4" alt="sgaichas avatar"></a></td>
+<td><a href="https://github.com/gambler1650" class="external-link"><img src="https://avatars1.githubusercontent.com/u/5949383?s=100&amp;v=4" alt="andybeet avatar"></a></td>
+<td><a href="https://github.com/slarge" class="external-link"><img src="https://avatars1.githubusercontent.com/u/5000131?s=100&amp;v=4" alt="slarge avatar"></a></td>
+<td><a href="https://github.com/RMORSEcode" class="external-link"><img src="https://avatars1.githubusercontent.com/u/10620840?s=100&amp;v=4" alt="RMORSEcode avatar"></a></td>
 </tr></tbody>
 </table>
 <div class="section level4">
@@ -127,10 +127,7 @@
 </div>
 </div>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="links">
+  </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/NOAA-EDAB/atlantisdiagnostics/" class="external-link">Browse source code</a></li>
@@ -174,23 +171,20 @@
 </ul>
 </div>
 
-  </div>
+  </aside>
 </div>
 
 
-      <footer><div class="copyright">
-  <p></p>
-<p>Developed by Sarah Gaichas, Andy Beet, Joeseph Caracappa, Robert Gamble, Ryan Morse.</p>
+    <footer><div class="pkgdown-footer-left">
+  <p>Developed by Sarah Gaichas, Andy Beet, Joeseph Caracappa, Robert Gamble, Ryan Morse.</p>
 </div>
 
-<div class="pkgdown">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<div class="pkgdown-footer-right">
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
-
 
 
 
