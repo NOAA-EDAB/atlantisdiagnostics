@@ -1,0 +1,42 @@
+url: https://noaa-edab.github.io/atlantisdiagnostics/
+
+template:
+ bootstrap: 5
+
+#needed for package to be linked by other locally installed packages
+deploy:
+  install_metadata: true
+
+reference:
+- title: "Processing model output"
+  desc: "Processing output from an atlantis run"
+- contents:
+  - starts_with("process")
+  - starts_with("get")
+- title: "Plotting model output"
+  desc: "Plotting the output from an atlantis run"
+- contents:
+  - starts_with("plot")
+  - starts_with("make")
+- title: "Diagnostic checks"
+  desc: "Determining if the model is behaving as expected"
+- contents:
+  - starts_with("diag")
+- title: "Miscellaneous"
+  desc: "Miscellaneous functions"
+- contents:
+  - starts_with("compare")
+  - starts_with("atlantis")
+
+
+navbar:
+ components:
+  articles:
+   text: Help
+   menu:
+   - text: Processing model output
+     href: articles/processing.html
+   - text: Plotting model output
+     href: articles/plotting.html
+   - text: Model diagnostics
+     href: articles/diagnostics.html
