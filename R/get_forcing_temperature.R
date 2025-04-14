@@ -13,6 +13,8 @@
 #' @param plotFigs logical. If TRUE, plots are generated
 #'
 #' @return tibble. Data frame of temperature data by box/layer/time
+#'
+#' @export
 
 
 get_forcing_temperature <- function(param.ls, plotFigs=F){

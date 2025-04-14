@@ -1,12 +1,14 @@
-#' Get adult distribution (FXXX_SY) values from a bio.prm file
+#' Get adult distribution (FXXX_SY) values from a biology prm file
 #'
 #' @description
 #' For each of the 4 seasons get the values (proportion of the population)
 #' that are distributed among polygons.
 #'
-#' @params bio.prm path to the bio.prm file
+#' @param bio.prm path to the biology prm file
 #'
 #' @return a data frame with the group, value and polygons, season, cohort
+#'
+#' @export
 
 get_param_FXXX_SY <- function(bio.prm){
 

@@ -1,12 +1,14 @@
-#' Get horizontal distribution recruitment values from a bio.prm file
+#' Get horizontal distribution recruitment values from a biology prm file
 #'
 #' @description
 #' The values are proportion of recruits and how they are distributed among
-#' the polygons. XXX_rectuit_hdistrib
+#' the polygons. XXX_recruit_hdistrib
 #'
-#' @params bio.prm path to the bio.prm file
+#' @param bio.prm path to the biology prm file
 #'
 #' @return a data frame with the group, value and polygon
+#'
+#' @export
 
 get_param_recruit_hdistrib <- function(bio.prm){
 

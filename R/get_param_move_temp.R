@@ -1,12 +1,14 @@
-#' Get min_move_temp & max_move_temp values from a bio.prm file
+#' Get min_move_temp & max_move_temp values from a biology prm file
 #'
 #' @description
 #' The values are the minimum and maximum temperatures that a group can tolerate
 #' XXX_min_move_temp, XXX_max_move_temp
 #'
-#' @params bio.prm path to the bio.prm file
+#' @param bio.prm path to the biology prm file
 #'
 #' @return a data frame with the group, value and limit (max/min)
+#'
+#' @export
 
 get_param_move_temp <- function(bio.prm){
 
