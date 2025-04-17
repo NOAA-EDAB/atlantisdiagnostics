@@ -17,5 +17,7 @@ list
 \item{unit}{units of parameter, if applicable}
 }
 \description{
-Pull out the parameters from the run prm file.
+Pull out the parameters from the run prm file. This will only return the values of
+parameters that have a scalar value. For example, if paramName = init_scalar, only the length
+of the vector will be returned.
 }
