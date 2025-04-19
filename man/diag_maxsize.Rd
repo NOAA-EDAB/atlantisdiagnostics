@@ -56,3 +56,12 @@ Returns a data frame indicating which species meet defined max weight/length cri
 Calculate average size of fish through time and check to see if any fish exceed the
 user supplied observed maximum size. Both maximum weight and maximum length are used
 }
+\seealso{
+Other diagnostics: 
+\code{\link{diag_cohortBiomass}()},
+\code{\link{diag_fleet_catch}()},
+\code{\link{diag_persistence}()},
+\code{\link{diag_reasonability}()},
+\code{\link{diag_temp_thresholds}()}
+}
+\concept{diagnostics}

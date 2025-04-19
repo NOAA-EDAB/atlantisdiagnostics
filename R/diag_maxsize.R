@@ -31,6 +31,7 @@
 #'\item{passL}{Boolean indicating whether species maximum length (from Atlantis) falls below max observed length}
 #'\item{ratioL}{ratio of atlantis max length to observed max length}
 #'
+#'@family diagnostics
 #'
 #'@importFrom magrittr %>%
 #'@importFrom rlang .data

@@ -31,7 +31,7 @@
 #'
 #'@export
 #'
-#'@family diags
+#'@family diagnostics
 #'
 #'@importFrom magrittr %>%
 #'@importFrom rlang .data
