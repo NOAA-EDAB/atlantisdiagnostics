@@ -6,7 +6,12 @@
 #'
 #' @param bio.prm path to the biology prm file
 #'
-#' @return a data frame with the group, cohort, value and layer
+#' @return a data frame
+#' \item{group}{Character string. Atlantis group code}
+#' \item{daynight}{Character string. "day" or "night"}
+#' \item{cohort}{Character string. "adult", "juvenile" or "biomass"}
+#' \item{layer}{Integer. Layer number}
+#' \item{value}{Value. Proportion of the population in the layer}
 #'
 #' @export
 
@@ -32,32 +37,50 @@ get_param_vert <- function(bio.prm){
   valuesD <- gsub("\t"," ",valuesD)
 
   # create a null dataframe
-  out.df = data.frame(group = NULL, daynight = NULL,cohort = NULL,layer=NULL, value=NULL)
+  outdf = data.frame(group = NULL, daynight = NULL,cohort = NULL,layer=NULL, value=NULL)
+
+  # process night
+  outdf <- process_vertical_distrib("night",linesN, valuesN, outdf)
+  outdf <- process_vertical_distrib("day",linesD, valuesD, outdf)
+
+  # return the data frame
+  return(outdf)
+}
+
+
+
+#' Process the vertical distribution data
+#'
+#' @description
+#' parse the day and night vectors to extract the group, cohort and values
+#'
+#' @return a data frame
+#' \item{group}{Character string. Atlantis group code}
+#' \item{daynight}{Character string. "day" or "night"}
+#' \item{cohort}{Character string. "adult", "juvenile" or "biomass"}
+#' \item{layer}{Integer. Layer number}
+#' \item{value}{Value. Proportion of the population in the layer}
+#'
+#'@family internal
+#'
+#' @noRd
+
+process_vertical_distrib <- function(daynightCode,linesX,valuesX, outdf) {
   # loop through the lines and extract the values, groups and the min/max
-  for (i in 1:length(linesN)){
+  for (i in 1:length(linesX)){
     # remove trailing part of the line where the number of values on next line is listed
-    linei <- gsub("\\s+[0-9]+","",linesN[i])
-    # check to see if string contains "night" or "day"
-    if(grepl("night",linei)) {
-      daynight <- "night"
-      # remove "VERTnight_" from linei
-      linei <- gsub("VERTnight_","",linei)
-    } else {
-      daynight <- "day"
-      # remove "VERTnight_" from linei
-      linei <- gsub("VERTday_","",linei)
-    }
+    linei <- gsub("\\s+[0-9]+","",linesX[i])
+    # asssign day or night
+    daynight <- daynightCode
+    # remove "VERTnight_" from linei
+    linei <- gsub(paste0("VERT",daynightCode,"_"),"",linei)
 
     #check for digit in name (vertibrate) or lack of digit (invertebrate)
     if (grepl("[0-9]",linei)) { # check for digit
       # vertibrate - remove the last character in linei
       lastdigit <- substr(linei,nchar(linei),nchar(linei))
       groupi <- substr(linei,1,nchar(linei)-1)
-      # use firstdigit to define juvenile or adult
-      if (groupi == "INV") {
-        print(linesN[i])
-        print(lastdigit)
-      }
+      # use lastdigit to define juvenile or adult
       if (lastdigit == "1") {
         cohorti <- "juv"
       } else {
@@ -69,7 +92,7 @@ get_param_vert <- function(bio.prm){
     }
 
     # now parse the values
-    valuei <- as.numeric(unlist(strsplit(valuesN[i]," ")))
+    valuei <- as.numeric(unlist(strsplit(valuesX[i]," ")))
     layeri <- data.frame(layer = c(length(valuei):1),value = valuei)
 
     df <- data.frame(group = groupi, daynight = daynight, cohort = cohorti)
@@ -78,11 +101,9 @@ get_param_vert <- function(bio.prm){
     df <- df[rep(seq_len(nrow(df)), each = nrow(layeri)),]
     rownames(df) <- NULL
 
-    out.df <- rbind(out.df,cbind(df,layeri))
+    outdf <- rbind(outdf,cbind(df,layeri))
 
   }
-  out.df <- tibble::as_tibble(out.df)
+  outdf <- tibble::as_tibble(outdf)
 
-  # return the data frame
-  return(out.df)
 }

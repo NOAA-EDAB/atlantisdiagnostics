@@ -10,7 +10,12 @@ get_param_vert(bio.prm)
 \item{bio.prm}{path to the biology prm file}
 }
 \value{
-a data frame with the group, cohort, value and layer
+a data frame
+\item{group}{Character string. Atlantis group code}
+\item{daynight}{Character string. "day" or "night"}
+\item{cohort}{Character string. "adult", "juvenile" or "biomass"}
+\item{layer}{Integer. Layer number}
+\item{value}{Value. Proportion of the population in the layer}
 }
 \description{
 Get the values (proportion of the population) that define the distribution among layers
