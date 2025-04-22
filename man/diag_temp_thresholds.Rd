@@ -12,28 +12,40 @@ diag_temp_thresholds(paramList, speciesCodes = NULL)
 \item{speciesCodes}{A character string of the species/group name of interest. Default is NULL (All species)}
 }
 \value{
-A list of data frames.
-\item{inverts}{A vector of Groups (usually invertibrates) that do not have temperature thresholds defined}
-\item{verts}{A data frame of species that have temperature thresholds defined. The columns are:
-\itemize{
-\item group - Species/Group name
-\item layer - Polygon layer
-\item recruitBoxes - Proportion of boxes that are not habitable for recruits due to temperature (relative to defined range)
-\item ageBoxesAdult - Proportion of boxes that are not habitable for adults due to temperature (relative to defined range)
-\item ageBoxesJuv - Proportion of boxes that are not habitable for juveniles due to temperature (relative to defined range)
-\item recruitTime - Proportion of time in model that recruits were distributed away from non habitable polygons
-\item ageTimeAdult - Proportion of time in model that adults were distributed away from non habitable polygons
-\item ageTimeJuv - Proportion of time in model that juveniles were distributed away from non habitable polygons
-\item rangeSame - Compares if the spatial footprint for juveniles (FXXX_SYjuv) agrees with recruits (recruits_hdist)
-\item pass - Logical indicating if the species passes the temperature threshold test. All fields < 0.01
-}
-}
+A data frame. Only groups that fail are returned. The columns are:
+\item{group}{Species/Group name}
+\item{layer}{Polygon layer}
+\item{recruitBoxes}{Proportion of boxes that are not habitable for recruits due to temperature (relative to defined range)}
+\item{ageBoxesAdult}{Proportion of boxes that are not habitable for adults due to temperature (relative to defined range)}
+\item{ageBoxesJuv}{Proportion of boxes that are not habitable for juveniles due to temperature (relative to defined range)}
+\item{recruitTime}{Proportion of time in model that recruits were distributed away from non habitable polygons}
+\item{ageTimeAdult}{Proportion of time in model that adults were distributed away from non habitable polygons}
+\item{ageTimeJuv}{Proportion of time in model that juveniles were distributed away from non habitable polygons}
+\item{pass}{Logical indicating if the species passes the temperature threshold test. All fields < 0.01}
 }
 \description{
 Determine if Groups have suitable habitat based on temperature thresholds.
-Horizontal redistribution proportions (FXXX_SY and recruit_hdist) are used to
+Horizontal redistribution proportions (FXXX_SY and recruit_hdist) and
+vertical distributions (vertDAY,vertNIGHT, recruit_vdistrib) are used to
 identify the spatial extent of the groups. Groups are then assessed as to whether
 these polygons are considered habitable based on temperature
+}
+\examples{
+\dontrun{
+# Declare paths to files required
+paramList <- list()
+paramList$bgm.file <- "Full path to bgm file"
+paramList$biol.prm <- "Full path to biology prm file"
+paramList$run.prm <- "Full path to run prm file"
+
+# check for any species that maybe impacted by temperature
+diag_temp_thresholds(paramList,speciesCodes=NULL)
+
+# check for HERRING and WHITE HAKE
+diag_temp_thresholds(paramList,speciesCodes=c("HER","WHK"))
+}
+
+
 }
 \seealso{
 Other diagnostics: 

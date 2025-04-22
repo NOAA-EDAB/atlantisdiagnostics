@@ -2,29 +2,42 @@
 #'
 #'@description
 #'Determine if Groups have suitable habitat based on temperature thresholds.
-#'Horizontal redistribution proportions (FXXX_SY and recruit_hdist) are used to
+#'Horizontal redistribution proportions (FXXX_SY and recruit_hdist) and
+#'vertical distributions (vertDAY,vertNIGHT, recruit_vdistrib) are used to
 #'identify the spatial extent of the groups. Groups are then assessed as to whether
 #'these polygons are considered habitable based on temperature
 #'
 #'@param paramList A list of parameter files (Output of \code{get_atl_paramfiles()})
 #'@param speciesCodes A character string of the species/group name of interest. Default is NULL (All species)
 #'
-#'@return A list of data frames.
-#'\item{inverts}{A vector of Groups (usually invertibrates) that do not have temperature thresholds defined}
-#'\item{verts}{A data frame of species that have temperature thresholds defined. The columns are:
-#'  * group - Species/Group name
-#'  * layer - Polygon layer
-#'  * recruitBoxes - Proportion of boxes that are not habitable for recruits due to temperature (relative to defined range)
-#'  * ageBoxesAdult - Proportion of boxes that are not habitable for adults due to temperature (relative to defined range)
-#'  * ageBoxesJuv - Proportion of boxes that are not habitable for juveniles due to temperature (relative to defined range)
-#'  * recruitTime - Proportion of time in model that recruits were distributed away from non habitable polygons
-#'  * ageTimeAdult - Proportion of time in model that adults were distributed away from non habitable polygons
-#'  * ageTimeJuv - Proportion of time in model that juveniles were distributed away from non habitable polygons
-#'  * rangeSame - Compares if the spatial footprint for juveniles (FXXX_SYjuv) agrees with recruits (recruits_hdist)
-#'  * pass - Logical indicating if the species passes the temperature threshold test. All fields < 0.01
-#'  }
+#'@return A data frame. Only groups that fail are returned. The columns are:
+#'\item{group}{Species/Group name}
+#'\item{layer}{Polygon layer}
+#'\item{recruitBoxes}{Proportion of boxes that are not habitable for recruits due to temperature (relative to defined range)}
+#'\item{ageBoxesAdult}{Proportion of boxes that are not habitable for adults due to temperature (relative to defined range)}
+#'\item{ageBoxesJuv}{Proportion of boxes that are not habitable for juveniles due to temperature (relative to defined range)}
+#'\item{recruitTime}{Proportion of time in model that recruits were distributed away from non habitable polygons}
+#'\item{ageTimeAdult}{Proportion of time in model that adults were distributed away from non habitable polygons}
+#'\item{ageTimeJuv}{Proportion of time in model that juveniles were distributed away from non habitable polygons}
+#'\item{pass}{Logical indicating if the species passes the temperature threshold test. All fields < 0.01}
 #'
 #'@family diagnostics
+#'
+#'@examples
+#'\dontrun{
+#'# Declare paths to files required
+#' paramList <- list()
+#' paramList$bgm.file <- "Full path to bgm file"
+#' paramList$biol.prm <- "Full path to biology prm file"
+#' paramList$run.prm <- "Full path to run prm file"
+#'
+#' # check for any species that maybe impacted by temperature
+#' diag_temp_thresholds(paramList,speciesCodes=NULL)
+#'
+#' # check for HERRING and WHITE HAKE
+#' diag_temp_thresholds(paramList,speciesCodes=c("HER","WHK"))
+#'}
+#'
 #'
 #'@export
 
@@ -80,8 +93,7 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
   # otherwise use both day and night
   if (dt == 24) {
     vdistAge <- vdistAge |>
-      dplyr::filter(group == speciesCodes,
-                    daynight == "day") |>
+      dplyr::filter(daynight == "day") |>
       dplyr::select(-daynight)
 
   }
@@ -163,39 +175,52 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
       }
 
 
-      # Similar for Adults and Juveniles
-      spatialExtentOfSpeciesAgeAdult <- hdistAge |>
-        dplyr::filter(group == species,
-                      cohort == "adult") |>
-        dplyr::select(polygon) |>
-        dplyr::distinct() |>
-        dplyr::pull()
-      spatialExtentOfSpeciesAgeJuv <- hdistAge |>
-        dplyr::filter(group == species,
-                      cohort == "juv") |>
-        dplyr::select(polygon) |>
-        dplyr::distinct() |>
-        dplyr::pull()
+      # check to see if the age structured species distributed into current layer
+      ageLayers <- vdistAge |>
+        dplyr::filter(group == species) |>
+        dplyr::pull(layer)
 
-      extremeDAdult <- extreme |>
-        dplyr::filter(polygon %in% spatialExtentOfSpeciesAgeAdult)
-      extremeDJuv <- extreme |>
-        dplyr::filter(polygon %in% spatialExtentOfSpeciesAgeJuv)
+      if (ilayer %in% ageLayers) {
 
-      # Adults
-      # find proportion of boxes in extremeD that relative to extent
-      propBoxesAgeAdult <- length(unique(extremeDAdult$polygon)) / length(unique(spatialExtentOfSpeciesAgeAdult))
-      # find proportion of time intervals in extremeD that relative to extent
-      propTimeAgeAdult <- length(unique(extremeDAdult$time)) / length(unique(data$time))
-      # Juveniles
-      # find proportion of boxes in extremeD that relative to extent
-      propBoxesAgeJuv <- length(unique(extremeDJuv$polygon)) / length(unique(spatialExtentOfSpeciesAgeJuv))
-      # find proportion of time intervals in extremeD that relative to extent
-      propTimeAgeJuv <- length(unique(extremeDJuv$time)) / length(unique(data$time))
+        # Similar for Adults and Juveniles
+        spatialExtentOfSpeciesAgeAdult <- hdistAge |>
+          dplyr::filter(group == species,
+                        cohort == "adult") |>
+          dplyr::select(polygon) |>
+          dplyr::distinct() |>
+          dplyr::pull()
+        spatialExtentOfSpeciesAgeJuv <- hdistAge |>
+          dplyr::filter(group == species,
+                        cohort == "juv") |>
+          dplyr::select(polygon) |>
+          dplyr::distinct() |>
+          dplyr::pull()
 
+        extremeDAdult <- extreme |>
+          dplyr::filter(polygon %in% spatialExtentOfSpeciesAgeAdult)
+        extremeDJuv <- extreme |>
+          dplyr::filter(polygon %in% spatialExtentOfSpeciesAgeJuv)
 
-      # check to see if spatial extent on resdistribution is same for recruits and non recruits (juvenile)
-      rangeSame <- identical(spatialExtentOfSpeciesRecruit,spatialExtentOfSpeciesAgeJuv)
+        # Adults
+        # find proportion of boxes in extremeD that relative to extent
+        propBoxesAgeAdult <- length(unique(extremeDAdult$polygon)) / length(unique(spatialExtentOfSpeciesAgeAdult))
+        # find proportion of time intervals in extremeD that relative to extent
+        propTimeAgeAdult <- length(unique(extremeDAdult$time)) / length(unique(data$time))
+        # Juveniles
+        # find proportion of boxes in extremeD that relative to extent
+        propBoxesAgeJuv <- length(unique(extremeDJuv$polygon)) / length(unique(spatialExtentOfSpeciesAgeJuv))
+        # find proportion of time intervals in extremeD that relative to extent
+        propTimeAgeJuv <- length(unique(extremeDJuv$time)) / length(unique(data$time))
+      } else {
+        propBoxesAgeAdult <- 0
+        # find proportion of time intervals in extremeD that relative to extent
+        propTimeAgeAdult <- 0
+        # Juveniles
+        # find proportion of boxes in extremeD that relative to extent
+        propBoxesAgeJuv <- 0
+        # find proportion of time intervals in extremeD that relative to extent
+        propTimeAgeJuv <- 0
+      }
 
       # All metrics need to be less than 0.01. uninhabitable areas < 1% of the total number of areas
       pass <- all(c(propBoxesRecruits,propTimeRecruits,propBoxesAgeJuv,propTimeAgeJuv,propBoxesAgeAdult,propTimeAgeAdult) < .01)
@@ -209,7 +234,6 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
                    recruitTime = propTimeRecruits,
                    ageTimeAdult = propTimeAgeAdult,
                    ageTimeJuv = propTimeAgeJuv,
-                   rangeSame = rangeSame,
                    pass = pass)
 
 
@@ -222,27 +246,19 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
     # split output based on NAs. NA's indicate they are not prescribed redistribution
     # proportions. Probably because they are invertebrates
 
-    tab <- list()
-    if(is.null(speciesCodes)) {
-      if (is.null(outdf)) {
-        tab$inverts <- NA
-        tab$verts <- NA
-      } else {
-        tab$inverts <- outdf |>
-          dplyr::filter(is.na(pass)) |>
-          dplyr::distinct(group)
-        tab$verts <- outdf |>
-          dplyr::filter(!is.na(pass)) |>
-          dplyr::as_tibble()
-      }
-
+    if (is.null(outdf)) {
+      tab <- NULL
     } else {
-      tab$inverts <- NA
-      tab$verts <- outdf |>
+      tab <- outdf |>
         dplyr::filter(!is.na(pass),
-                      group == speciesCodes) |>
+                      pass == FALSE) |>
         dplyr::as_tibble()
+
+      if (nrow(tab) == 0) {
+        tab <- NULL
+      }
     }
+
 
   }
 
