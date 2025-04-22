@@ -36,18 +36,30 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
   check_param_files(paramList$bgm.file)
   check_param_files(paramList$biol.prm)
 
+
+  ## Grab the min and max temperature by polygon from the biology.prm file
+  temperatureLimits <- get_param_move_temp(paramList$biol.prm)
+  if(is.null(speciesCodes)) {
+    speciesCodes <- unique(temperatureLimits$group)
+  } else {
+    # check to see if speciesCodes is in the temperatureLimits
+    if (!speciesCodes %in% unique(temperatureLimits$group)) {
+      stop(paste0("Species Code", speciesCodes, " not found"))
+    }
+  }
+
   # get the temperature forcing data by time/polygon/layer
-  tempD <- get_forcing_temperature(paramList, plotFigs=F)
+  temperatureData <- get_forcing_temperature(paramList, plotFigs=F)
   # read in the output frequency to scale the recruitment time diagnostic
   toutinc <- get_run_prm(paramList$run.prm, "toutinc")
   numValsPerYear <- 365/toutinc$value
+  # read in the time step
+  dt <- get_run_prm(paramList$run.prm, "dt")$value
 
   # get boundary boxes
   boxcoords <- atlantistools::load_box(paramList$bgm.file)
   bboxes <- atlantistools::get_boundary(boxcoords)
 
-  ## Grab the min and max temperature by polygon from the biology.prm file
-  tempMove <- get_param_move_temp(paramList$biol.prm)
   # grab the horizontal redistrbution proportions for recruitment
   hdistRecruit <- get_param_recruit_hdistrib(paramList$biol.prm) |>
     dplyr::filter(!(polygon %in% bboxes),
@@ -64,29 +76,41 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
   vdistAge <- get_param_vert(paramList$biol.prm)|>
     dplyr::filter(value > 1e-5)
 
+  # use either day of night vertical distribution parameters if time step is 24 hours
+  # otherwise use both day and night
+  if (dt == 24) {
+    vdistAge <- vdistAge |>
+      dplyr::filter(group == speciesCodes,
+                    daynight == "day") |>
+      dplyr::select(-daynight)
+
+  }
+
+
+
 
   ## diagnostic to indicate which species have temperature values
   # within the bounds of the forcing time series. This would indicate that
   # the species is forced to move.
 
-  # loop over layers
   outdf <- NULL
-  for (ilayer in sort(unique(tempD$layer))) {
-    # use the forcing temp data tempD for each layer
-    data = tempD |>
+  # loop over layers
+  for (ilayer in sort(unique(temperatureData$layer))) {
+    # use the forcing temp data temperatureData for each layer
+    data <- temperatureData |>
       dplyr::filter(layer == ilayer) |>
       dplyr::select(-variable,-layer)
     if (nrow(data) == 0) {
       next
     }
 
-    # lop over species
+    # loop over species
     # check to see if any species are affected by temperature
-    # Determine if tempMove fall inside the range of the temperature data
-    for (species in unique(tempMove$group)) {
+    # Determine if temperatureLimits fall inside the range of the temperature data
+    for (species in speciesCodes) {
 
       # obtain the temperature thresholds for each species
-      speciesData <- tempMove |>
+      speciesData <- temperatureLimits |>
         dplyr::filter(group == species)
       # select the value of speciesData where limit = min
       # and the value of speciesData where limit = max
@@ -113,13 +137,8 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
         dplyr::pull(layer)
 
       if (ilayer %in% recruitLayers) {
-        # check to see if the species recruits into current layer
-        recruitLayers <- hdistRecruit |>
-          dplyr::filter(group == species) |>
-          dplyr::pull(layer)
-
         # look for how temperature effects recruitment
-        # select the polygons that that recruits are distributed to
+        # select the polygons that the recruits are distributed to
         spatialExtentOfSpeciesRecruit <- hdistRecruit |>
           dplyr::filter(group == species) |>
           dplyr::select(polygon) |>
@@ -128,7 +147,6 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
 
         # filter all the polygons that recruits are distributed to that are outside of the species
         # thermal limits (not habitable)
-
         extremeD <- extreme |>
           dplyr::filter(polygon %in% spatialExtentOfSpeciesRecruit)
 
@@ -143,6 +161,7 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
         propBoxesRecruits <- 0
         propTimeRecruits <- 0
       }
+
 
       # Similar for Adults and Juveniles
       spatialExtentOfSpeciesAgeAdult <- hdistAge |>
