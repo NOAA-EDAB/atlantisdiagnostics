@@ -5,7 +5,9 @@
 #'Horizontal redistribution proportions (FXXX_SY and recruit_hdist) and
 #'vertical distributions (vertDAY,vertNIGHT, recruit_vdistrib) are used to
 #'identify the spatial extent of the groups. Groups are then assessed as to whether
-#'these polygons are considered habitable based on temperature
+#'these polygons are considered habitable based on temperature.
+#'
+#'Note: The union of polygons over all seasons is used in comparisons
 #'
 #'@param paramList A list of parameter files (Output of \code{get_atl_paramfiles()})
 #'@param speciesCodes A character string of the species/group name of interest. Default is NULL (All species)
@@ -20,6 +22,10 @@
 #'\item{ageTimeAdult}{Proportion of time in model that adults were distributed away from non habitable polygons}
 #'\item{ageTimeJuv}{Proportion of time in model that juveniles were distributed away from non habitable polygons}
 #'\item{pass}{Logical indicating if the species passes the temperature threshold test. All fields < 0.01}
+#'
+#' @section Layers:
+#' 0 = Surface, 4 is sediment
+#' The sediment layer is not returned in the output.
 #'
 #'@family diagnostics
 #'
@@ -251,7 +257,8 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
     } else {
       tab <- outdf |>
         dplyr::filter(!is.na(pass),
-                      pass == FALSE) |>
+                      pass == FALSE,
+                      layer != 4) |>
         dplyr::as_tibble()
 
       if (nrow(tab) == 0) {

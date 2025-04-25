@@ -1,7 +1,7 @@
 #' Read in temperature forcing by box or from output.nc
 #'
 #'@description
-#' To ge a better idea of how temperature changes in space
+#' To get a better idea of how temperature changes in space
 #' and time
 #'
 #' Important to discern if species distribution changes are due
@@ -12,7 +12,11 @@
 #' @param param.ls list. List of file paths from Atlantis model
 #' @param plotFigs logical. If TRUE, plots are generated
 #'
+#' @section Layers:
+#' 0 = Surface, 4 is sediment
+#'
 #' @return tibble. Data frame of temperature data by box/layer/time
+#'
 #'
 #' @export
 

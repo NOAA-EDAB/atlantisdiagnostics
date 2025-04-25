@@ -28,8 +28,16 @@ Determine if Groups have suitable habitat based on temperature thresholds.
 Horizontal redistribution proportions (FXXX_SY and recruit_hdist) and
 vertical distributions (vertDAY,vertNIGHT, recruit_vdistrib) are used to
 identify the spatial extent of the groups. Groups are then assessed as to whether
-these polygons are considered habitable based on temperature
+these polygons are considered habitable based on temperature.
+
+Note: The union of polygons over all seasons is used in comparisons
 }
+\section{Layers}{
+
+0 = Surface, 4 is sediment
+The sediment layer is not returned in the output.
+}
+
 \examples{
 \dontrun{
 # Declare paths to files required
