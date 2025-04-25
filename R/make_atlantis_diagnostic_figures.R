@@ -807,6 +807,24 @@ make_atlantis_diagnostic_figures = function(out.dir,
     temp.plot.4 = add.title(temp.plot.4,'Change in Water Column Height')
     temp.plot.4 = ggplot2::update_labels(temp.plot.4, list(y = ''))
 
+    # Additional Temp plots (boxplot by layer and polygon)
+    tempD <- physics.statevars |>
+      dplyr::filter(variable == "Temp") |>
+      dplyr::group_by(polygon,time) |>
+      dplyr::mutate(layer = dplyr::n()-2-layer) |>
+      dplyr::mutate(layer = dplyr::case_when(layer < 0 ~ 4,
+                                             .default = layer)) |>
+      dplyr::ungroup() |>
+      dplyr::mutate(layer = as.factor(layer))
+    tempD$layer <- factor(tempD$layer, levels = rev(levels(tempD$layer)))
+    temp.plot.5 <- ggplot2::ggplot(data = tempD) +
+      ggplot2::geom_boxplot(ggplot2::aes(atoutput,layer,group=layer),outlier.size = 0.5) +
+      ggplot2::facet_wrap(~polygon) +
+      ggplot2::xlab("Temperature (\u00b0C)") +
+      ggplot2::ylab("Layer (0 = Surface, 4 = Sediment)") +
+      ggplot2::ggtitle("Temperature distribution by polygon/layer")
+
+
     pdf(file = file.path(fig.dir,paste0(run.name, ' Physics Timeseries.pdf')),width = 60, height = 18, onefile = T)
     gridExtra::grid.arrange(temp.plot.1)
     for(i in 1:length(phys.plots)){
@@ -815,6 +833,7 @@ make_atlantis_diagnostic_figures = function(out.dir,
     gridExtra::grid.arrange(temp.plot.2)
     gridExtra::grid.arrange(temp.plot.3)
     gridExtra::grid.arrange(temp.plot.4)
+    gridExtra::grid.arrange(temp.plot.5)
     dev.off()
 
     rm(physics.statevars,flux,source.sink,dz,nominal.dz)
