@@ -1,4 +1,4 @@
-#' Check to make sure paramater file exists
+#' Check to make sure parameter file exists
 #'
 #' @description
 #' This function checks to make sure the parameter file exists in the specified
@@ -6,9 +6,10 @@
 #'
 #'@param paramFile The path to the parameter file.
 #'
+#'@return Nothing. Errors is invalid
+#'
 #'@noRd
 #'
-#'@export
 
 check_param_files <- function(paramFile) {
   # Check if the parameter file exists
