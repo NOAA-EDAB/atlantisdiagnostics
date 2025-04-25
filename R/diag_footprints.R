@@ -4,21 +4,15 @@
 #'Determine if Groups have the sam footprint for timestep redistribution
 #'Horizontal redistribution proportions (FXXX_SY and recruit_hdist) and
 #'vertical distributions (vertDAY,vertNIGHT, recruit_vdistrib) are used to
-#'compare the spatial extent of the groups. 
-#' 
+#'compare the spatial extent of the groups.
+#'
 #'@param paramList A list of parameter files (Output of \code{get_atl_paramfiles()})
 #'@param speciesCodes A character string of the species/group name of interest. Default is NULL (All species)
 #'
-#'@return A data frame. Only groups that fail are returned. The columns are:
+#'@return A data frame. The columns are:
 #'\item{group}{Species/Group name}
-#'\item{layer}{Polygon layer}
-#'\item{recruitBoxes}{Proportion of boxes that are not habitable for recruits due to temperature (relative to defined range)}
-#'\item{ageBoxesAdult}{Proportion of boxes that are not habitable for adults due to temperature (relative to defined range)}
-#'\item{ageBoxesJuv}{Proportion of boxes that are not habitable for juveniles due to temperature (relative to defined range)}
-#'\item{recruitTime}{Proportion of time in model that recruits were distributed away from non habitable polygons}
-#'\item{ageTimeAdult}{Proportion of time in model that adults were distributed away from non habitable polygons}
-#'\item{ageTimeJuv}{Proportion of time in model that juveniles were distributed away from non habitable polygons}
-#'\item{pass}{Logical indicating if the species passes the temperature threshold test. All fields < 0.01}
+#'\item{adultJuv}{Logical value indicating if the adult and juvenile spatial distributions are the same}
+#'\item{recruitJuv}{Logival value indicating if the juvenile and recruit spatial distributions are the same}
 #'
 #'
 #'@family diagnostics
@@ -37,7 +31,7 @@
 #' # check for HERRING and WHITE HAKE
 #' diag_footprints(paramList,speciesCodes=c("HER","WHK"))
 #'}
-#' 
+#'
 #'@export
 
 diag_footprints <- function(paramList, speciesCodes=NULL) {
@@ -107,7 +101,7 @@ diag_footprints <- function(paramList, speciesCodes=NULL) {
             dplyr::select(polygon) |>
             dplyr::distinct() |>
             dplyr::pull()
-      
+
         recruitJuv <- identical(spatialExtentOfSpeciesRecruit,spatialExtentOfSpeciesAgeJuv)
         adultJuv <- identical(spatialExtentOfSpeciesAgeAdult,spatialExtentOfSpeciesAgeJuv)
     } else {
@@ -120,7 +114,7 @@ diag_footprints <- function(paramList, speciesCodes=NULL) {
       data.frame(group = species,
                  adultJuv = adultJuv,
                  recruitJuv = recruitJuv)
-    
+
     tab <- dplyr::bind_rows(tab,speciesContrib)
 
   }

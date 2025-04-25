@@ -12,16 +12,10 @@ diag_footprints(paramList, speciesCodes = NULL)
 \item{speciesCodes}{A character string of the species/group name of interest. Default is NULL (All species)}
 }
 \value{
-A data frame. Only groups that fail are returned. The columns are:
+A data frame. The columns are:
 \item{group}{Species/Group name}
-\item{layer}{Polygon layer}
-\item{recruitBoxes}{Proportion of boxes that are not habitable for recruits due to temperature (relative to defined range)}
-\item{ageBoxesAdult}{Proportion of boxes that are not habitable for adults due to temperature (relative to defined range)}
-\item{ageBoxesJuv}{Proportion of boxes that are not habitable for juveniles due to temperature (relative to defined range)}
-\item{recruitTime}{Proportion of time in model that recruits were distributed away from non habitable polygons}
-\item{ageTimeAdult}{Proportion of time in model that adults were distributed away from non habitable polygons}
-\item{ageTimeJuv}{Proportion of time in model that juveniles were distributed away from non habitable polygons}
-\item{pass}{Logical indicating if the species passes the temperature threshold test. All fields < 0.01}
+\item{adultJuv}{Logical value indicating if the adult and juvenile spatial distributions are the same}
+\item{recruitJuv}{Logival value indicating if the juvenile and recruit spatial distributions are the same}
 }
 \description{
 Determine if Groups have the sam footprint for timestep redistribution
