@@ -56,6 +56,7 @@ over the last n years of a run.
 \seealso{
 Other diagnostics: 
 \code{\link{diag_cohortBiomass}()},
+\code{\link{diag_footprints}()},
 \code{\link{diag_maxsize}()},
 \code{\link{diag_persistence}()},
 \code{\link{diag_reasonability}()},

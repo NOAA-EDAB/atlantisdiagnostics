@@ -60,6 +60,7 @@ user supplied observed maximum size. Both maximum weight and maximum length are 
 Other diagnostics: 
 \code{\link{diag_cohortBiomass}()},
 \code{\link{diag_fleet_catch}()},
+\code{\link{diag_footprints}()},
 \code{\link{diag_persistence}()},
 \code{\link{diag_reasonability}()},
 \code{\link{diag_temp_thresholds}()}

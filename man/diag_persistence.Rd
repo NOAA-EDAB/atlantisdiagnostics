@@ -71,6 +71,7 @@ diag_persistence(fgs,biomind, speciesCodes="HER", nYrs = 10, floor = 0.1)
 Other diagnostics: 
 \code{\link{diag_cohortBiomass}()},
 \code{\link{diag_fleet_catch}()},
+\code{\link{diag_footprints}()},
 \code{\link{diag_maxsize}()},
 \code{\link{diag_reasonability}()},
 \code{\link{diag_temp_thresholds}()}

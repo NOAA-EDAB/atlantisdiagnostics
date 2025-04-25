@@ -44,6 +44,7 @@ the smallest or largest age class
 \seealso{
 Other diagnostics: 
 \code{\link{diag_fleet_catch}()},
+\code{\link{diag_footprints}()},
 \code{\link{diag_maxsize}()},
 \code{\link{diag_persistence}()},
 \code{\link{diag_reasonability}()},

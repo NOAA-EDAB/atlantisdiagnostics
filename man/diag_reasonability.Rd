@@ -98,6 +98,7 @@ diag_reasonability(fgs, biomind, initialYr = 1964, speciesCodes =c("MAK","WHK"),
 Other diagnostics: 
 \code{\link{diag_cohortBiomass}()},
 \code{\link{diag_fleet_catch}()},
+\code{\link{diag_footprints}()},
 \code{\link{diag_maxsize}()},
 \code{\link{diag_persistence}()},
 \code{\link{diag_temp_thresholds}()}

@@ -51,6 +51,7 @@ diag_temp_thresholds(paramList,speciesCodes=c("HER","WHK"))
 Other diagnostics: 
 \code{\link{diag_cohortBiomass}()},
 \code{\link{diag_fleet_catch}()},
+\code{\link{diag_footprints}()},
 \code{\link{diag_maxsize}()},
 \code{\link{diag_persistence}()},
 \code{\link{diag_reasonability}()}
