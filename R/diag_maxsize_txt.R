@@ -22,6 +22,7 @@
 #'
 #'@noRd
 #'
+#'@family diagnostics
 #'
 #'@examples
 #'\dontrun{

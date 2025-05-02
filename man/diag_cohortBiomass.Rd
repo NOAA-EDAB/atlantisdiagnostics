@@ -41,3 +41,13 @@ Determine which age classes contain the most biomass and compare to neighboring
 age classes. A species fails the test if all biomass is contained in either
 the smallest or largest age class
 }
+\seealso{
+Other diagnostics: 
+\code{\link{diag_fleet_catch}()},
+\code{\link{diag_footprints}()},
+\code{\link{diag_maxsize}()},
+\code{\link{diag_persistence}()},
+\code{\link{diag_reasonability}()},
+\code{\link{diag_temp_thresholds}()}
+}
+\concept{diagnostics}

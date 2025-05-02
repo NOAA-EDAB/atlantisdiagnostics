@@ -27,7 +27,7 @@
 #'\item{catch.magnitude}{Logical. Is the relative difference between model and refernece catch within +/- relChangeThreshold?}
 #'\item{catch.dist}{Logical. Is the distance between center of gravity betwene model and reference less than min.dist?}
 #'
-#'@family diags
+#'@family diagnostics
 #'
 #'@export
 #'

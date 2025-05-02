@@ -21,6 +21,8 @@
 #'\item{priority}{Scale defining priority of species in the model, High (H), Low(L) }
 #'\item{fishing}{Scale defining level of fishing, 1 is highest}
 #'
+#'@family diagnostics
+#'
 #' @export
 
 diag_cohortBiomass <- function(fgs,

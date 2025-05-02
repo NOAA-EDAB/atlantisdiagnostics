@@ -27,6 +27,8 @@ reference:
 - contents:
   - starts_with("compare")
   - starts_with("atlantis")
+  - starts_with("check")
+
 
 
 navbar:

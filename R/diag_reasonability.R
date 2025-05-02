@@ -42,7 +42,7 @@
 #'then survey data is used to assess reasonability. Otherwise deviations from initial biomass is used}
 #'
 #'
-#'@family diags
+#'@family diagnostics
 #'
 #'@export
 #'

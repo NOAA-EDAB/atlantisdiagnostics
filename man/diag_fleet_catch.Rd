@@ -54,9 +54,12 @@ Returns a data frame of all species and how they measure up against the catch by
 over the last n years of a run.
 }
 \seealso{
-Other diags: 
+Other diagnostics: 
+\code{\link{diag_cohortBiomass}()},
+\code{\link{diag_footprints}()},
+\code{\link{diag_maxsize}()},
 \code{\link{diag_persistence}()},
 \code{\link{diag_reasonability}()},
-\code{\link{diag_stability}()}
+\code{\link{diag_temp_thresholds}()}
 }
-\concept{diags}
+\concept{diagnostics}

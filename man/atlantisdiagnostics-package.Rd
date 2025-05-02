@@ -27,7 +27,7 @@ To learn more about using \code{atlantisdiagnostics}, start with the vignette: \
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/NOAA-EDAB/atlantisdiagnostics}
+  \item \url{https://github.com/NOAA-EDAB/atlantisdiagnostics,https://noaa-edab.github.io/atlantisdiagnostics/}
   \item Report bugs at \url{https://github.com/NOAA-EDAB/atlantisdiagnostics/issues}
 }
 
