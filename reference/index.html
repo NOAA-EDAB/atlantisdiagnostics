@@ -15,7 +15,8 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/atlantisdiagnostics.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-help" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Help</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-help"><li><a class="dropdown-item" href="../articles/processing.html">Processing model output</a></li>
@@ -65,6 +66,48 @@
 
         </dt>
         <dd>Creates a dataframe of atlantis parameter files based on standard output</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_forcing_temperature.html">get_forcing_temperature()</a></code>
+
+        </dt>
+        <dd>Read in temperature forcing by box or from output.nc</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_param_FXXX_SY.html">get_param_FXXX_SY()</a></code>
+
+        </dt>
+        <dd>Get adult distribution (FXXX_SY) values from a biology prm file</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_param_move_temp.html">get_param_move_temp()</a></code>
+
+        </dt>
+        <dd>Get min_move_temp &amp; max_move_temp values from a biology prm file</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_param_recruit_hdistrib.html">get_param_recruit_hdistrib()</a></code>
+
+        </dt>
+        <dd>Get horizontal distribution recruitment values from a biology prm file</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_param_recruit_vdistrib.html">get_param_recruit_vdistrib()</a></code>
+
+        </dt>
+        <dd>Get vertical distribution recruitment values from a biology prm file</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_param_vert.html">get_param_vert()</a></code>
+
+        </dt>
+        <dd>Get adult distribution (vertDAY_XXX, vertNIGHT_XXX) values from a biology prm file</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_run_prm.html">get_run_prm()</a></code>
+
+        </dt>
+        <dd>Get parameters from the run prm file</dd>
       </dl></div><div class="section level2">
       <h2 id="plotting-model-output">Plotting model output<a class="anchor" aria-label="anchor" href="#plotting-model-output"></a></h2>
 
@@ -113,6 +156,12 @@
         <dd>Test fleet catch</dd>
       </dl><dl><dt>
 
+          <code><a href="diag_footprints.html">diag_footprints()</a></code>
+
+        </dt>
+        <dd>Compares the redistribution footprints for groups in the model</dd>
+      </dl><dl><dt>
+
           <code><a href="diag_maxsize.html">diag_maxsize()</a></code>
 
         </dt>
@@ -135,6 +184,12 @@
 
         </dt>
         <dd>Test for functional group stability</dd>
+      </dl><dl><dt>
+
+          <code><a href="diag_temp_thresholds.html">diag_temp_thresholds()</a></code>
+
+        </dt>
+        <dd>Compares the temperature forcing data to the Group temperature thresholds</dd>
       </dl></div><div class="section level2">
       <h2 id="miscellaneous">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous"></a></h2>
 
@@ -168,7 +223,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>

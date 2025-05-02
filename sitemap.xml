@@ -1,6 +1,11 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/404.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/LICENSE-text.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/articles/atlantisdiagnostics.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/articles/diagnostics.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/articles/index.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/articles/plotting.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/articles/processing.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/authors.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/index.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/atlantisdiagnostics-package.html</loc></url>
@@ -8,11 +13,20 @@
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/diag_cohortBiomass.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/diag_combine.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/diag_fleet_catch.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/diag_footprints.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/diag_maxsize.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/diag_persistence.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/diag_reasonability.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/diag_stability.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/diag_temp_thresholds.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/get_atl_paramfiles.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/get_forcing_temperature.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/get_param_FXXX_SY.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/get_param_move_temp.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/get_param_recruit_hdistrib.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/get_param_recruit_vdistrib.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/get_param_vert.html</loc></url>
+<url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/get_run_prm.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/index.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/make_atlantis_diagnostic_figures.html</loc></url>
 <url><loc>https://noaa-edab.github.io/atlantisdiagnostics/reference/process_atl_output.html</loc></url>
