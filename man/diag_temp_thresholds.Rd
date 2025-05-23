@@ -34,7 +34,7 @@ Note: The union of polygons over all seasons is used in comparisons
 }
 \section{Layers}{
 
-0 = Surface, 4 is sediment
+1 = Surface, n is sediment
 The sediment layer is not returned in the output.
 }
 
