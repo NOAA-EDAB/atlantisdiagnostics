@@ -24,7 +24,7 @@
 #'\item{pass}{Logical indicating if the species passes the temperature threshold test. All fields < 0.01}
 #'
 #' @section Layers:
-#' 0 = Surface, 4 is sediment
+#' 1 = Surface, n is sediment
 #' The sediment layer is not returned in the output.
 #'
 #'@family diagnostics
@@ -68,7 +68,10 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
   }
 
   # get the temperature forcing data by time/polygon/layer
-  temperatureData <- get_forcing_temperature(paramList, plotFigs=F)
+  # increase layer vlaue to match other outputs
+  temperatureData <- get_forcing_temperature(paramList, plotFigs=F) |>
+    dplyr::mutate(layer = as.numeric(levels(layer)[layer])+1)
+  sedimentLayer <- max(temperatureData$layer)
   # read in the output frequency to scale the recruitment time diagnostic
   toutinc <- get_run_prm(paramList$run.prm, "toutinc")
   numValsPerYear <- 365/toutinc$value
@@ -101,11 +104,9 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
     vdistAge <- vdistAge |>
       dplyr::filter(daynight == "day") |>
       dplyr::select(-daynight)
-
+  } else {
+    stop("Not coded for dt != 24 hours")
   }
-
-
-
 
   ## diagnostic to indicate which species have temperature values
   # within the bounds of the forcing time series. This would indicate that
@@ -208,6 +209,8 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
           dplyr::filter(polygon %in% spatialExtentOfSpeciesAgeJuv)
 
         # Adults
+        nBoxesOccupiedAdult <- length(unique(spatialExtentOfSpeciesAgeAdult))
+        nBoxesOccupiedJuv <- length(unique(spatialExtentOfSpeciesAgeJuv))
         # find proportion of boxes in extremeD that relative to extent
         propBoxesAgeAdult <- length(unique(extremeDAdult$polygon)) / length(unique(spatialExtentOfSpeciesAgeAdult))
         # find proportion of time intervals in extremeD that relative to extent
@@ -236,7 +239,9 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
                    layer = ilayer,
                    recruitBoxes = propBoxesRecruits,
                    ageBoxesAdult = propBoxesAgeAdult,
+                   nBoxesOccupiedAdult = nBoxesOccupiedAdult,
                    ageBoxesJuv = propBoxesAgeJuv,
+                   nBoxesOccupiedJuv = nBoxesOccupiedJuv,
                    recruitTime = propTimeRecruits,
                    ageTimeAdult = propTimeAgeAdult,
                    ageTimeJuv = propTimeAgeJuv,
@@ -258,7 +263,7 @@ diag_temp_thresholds <- function(paramList, speciesCodes=NULL) {
       tab <- outdf |>
         dplyr::filter(!is.na(pass),
                       pass == FALSE,
-                      layer != 4) |>
+                      layer != sedimentLayer) |>
         dplyr::as_tibble()
 
       if (nrow(tab) == 0) {
