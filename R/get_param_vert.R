@@ -2,7 +2,10 @@
 #'
 #' @description
 #' Get the values (proportion of the population) that define the distribution among layers
-#' of a boxes for each 12 hour period.
+#' of a boxes for each 12 hour period. vertDAY_XXX and vertNIGHT_XXX are vectors. The length is the number of
+#' non sediment layers. The first entry for each vector refers to water column layer
+#' closest to the sediment and then up through the water column. Sediment layer is absent
+#'
 #'
 #' @param bio.prm path to the biology prm file
 #'
