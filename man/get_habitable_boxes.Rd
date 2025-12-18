@@ -2,40 +2,32 @@
 % Please edit documentation in R/get_habitable_boxes.R
 \name{get_habitable_boxes}
 \alias{get_habitable_boxes}
-\title{Compares the temperature forcing data to the Group temperature thresholds}
+\title{Returns a list of habitable boxes for atlantis groups based on temperature forcing}
 \usage{
-get_habitable_boxes(paramList, speciesCodes = NULL)
+get_habitable_boxes(paramList, speciesCodes = NULL, timeFrame = -1)
 }
 \arguments{
 \item{paramList}{A list of parameter files (Output of \code{get_atl_paramfiles()})}
 
 \item{speciesCodes}{A character string of the species/group name of interest. Default is NULL (All species)}
+
+\item{timeFrame}{Numeric. Section of time series of interest. For example, 10:20 (between year 10 and 20), -1 (last year of the timeseries), -10 (last 10 years of the time series)}
 }
 \value{
-A data frame. Only groups that fail are returned. The columns are:
+A data frame. Box/layers which are habitable over time range. The columns are:
 \item{group}{Species/Group name}
 \item{layer}{Polygon layer}
-\item{recruitBoxes}{Proportion of boxes that are not habitable for recruits due to temperature (relative to defined range)}
-\item{ageBoxesAdult}{Proportion of boxes that are not habitable for adults due to temperature (relative to defined range)}
-\item{ageBoxesJuv}{Proportion of boxes that are not habitable for juveniles due to temperature (relative to defined range)}
-\item{recruitTime}{Proportion of time in model that recruits were distributed away from non habitable polygons}
-\item{ageTimeAdult}{Proportion of time in model that adults were distributed away from non habitable polygons}
-\item{ageTimeJuv}{Proportion of time in model that juveniles were distributed away from non habitable polygons}
-\item{pass}{Logical indicating if the species passes the temperature threshold test. All fields < 0.01}
+\item{habitableBoxes}{The Boxes/polygons in which are habitable based on temperature thresholds}
 }
 \description{
-Determine if Groups have suitable habitat based on temperature thresholds.
-Horizontal redistribution proportions (FXXX_SY and recruit_hdist) and
-vertical distributions (vertDAY,vertNIGHT, recruit_vdistrib) are used to
-identify the spatial extent of the groups. Groups are then assessed as to whether
-these polygons are considered habitable based on temperature.
+Determine if Groups have suitable habitat (set of polygons/boxes by layer) based on temperature thresholds.
 
-Note: The union of polygons over all seasons is used in comparisons
+Horizontal redistribution proportions (FXXX_SY and recruit_hdist) and
+vertical distributions (vertDAY,vertNIGHT, recruit_vdistrib) are NOT used.
 }
 \section{Layers}{
 
 1 = Surface, n is sediment
-The sediment layer is not returned in the output.
 }
 
 \examples{
@@ -46,23 +38,16 @@ paramList$bgm.file <- "Full path to bgm file"
 paramList$biol.prm <- "Full path to biology prm file"
 paramList$run.prm <- "Full path to run prm file"
 
-# check for any species that maybe impacted by temperature
-diag_temp_thresholds(paramList,speciesCodes=NULL)
+# Get all habitable boxes in the last year of the run for all species
+get_habitable_boxes(paramList, speciesCodes=NULL, timeFrame = -1)
 
-# check for HERRING and WHITE HAKE
-diag_temp_thresholds(paramList,speciesCodes=c("HER","WHK"))
+# Get all habitable boxes for HERRING and WHITE HAKE for the period of the last 10 years
+# Note: if a box is considered habitable for any of the last 10 years it will be present in the output
+diag_temp_thresholds(paramList, speciesCodes=c("HER","WHK"), timeFrame = -10)
+
+# Get all habitable boxes for HERRING between the 10th and 11th year of the temperature forcing data
+diag_temp_thresholds(paramList, speciesCodes=c("HER"), timeFrame = 10:11)
 }
 
 
 }
-\seealso{
-Other diagnostics: 
-\code{\link{diag_cohortBiomass}()},
-\code{\link{diag_fleet_catch}()},
-\code{\link{diag_footprints}()},
-\code{\link{diag_maxsize}()},
-\code{\link{diag_persistence}()},
-\code{\link{diag_reasonability}()},
-\code{\link{diag_temp_thresholds}()}
-}
-\concept{diagnostics}
