@@ -33,27 +33,30 @@
 #'
 #'@importFrom magrittr %>%
 
-diag_fleet_catch <- function(fgs,
-                             fishery.prm,
-                             catch.file,
-                             bgm,
-                             catch.ref,
-                             speciesCodes = NULL,
-                             nYrs = 20,
-                             min.dist = 100,
-                             relChangeThreshold = 0.01){
+diag_fleet_catch <- function(
+  fgs,
+  fishery.prm,
+  catch.file,
+  bgm,
+  catch.ref,
+  speciesCodes = NULL,
+  nYrs = 20,
+  min.dist = 100,
+  relChangeThreshold = 0.01
+) {
+  boxes = atlantistools::convert_bgm(bgm) %>%
+    dplyr::distinct(polygon, inside_lat, inside_long)
 
-  boxes = atlantistools::convert_bgm(bgm)%>%
-    dplyr::distinct(polygon,inside_lat,inside_long)
+  catch.fleet = process_catch_fleet(
+    fishery.prm = fishery.prm,
+    catch = catch.file,
+    groups.file = fgs
+  )
 
-  catch.fleet =process_catch_fleet(fishery.prm = fishery.prm,
-                                          catch = catch.file,
-                                          groups.file = fgs)
+  if (!is.null(speciesCodes)) {
+    fgs.df = read.csv(fgs, as.is = T)
 
-  if(!is.null(speciesCodes)){
-    fgs.df = read.csv(fgs,as.is =T)
-
-    spp.match  = fgs.df$LongName[which(fgs.df$Code %in% speciesCodes)]
+    spp.match = fgs.df$LongName[which(fgs.df$Code %in% speciesCodes)]
 
     catch.fleet = catch.fleet %>%
       dplyr::filter(species %in% spp.match)
@@ -64,60 +67,88 @@ diag_fleet_catch <- function(fgs,
   max.yr = max(catch.fleet$time)
 
   #mnagnitude
-  catch.mag.model =catch.fleet %>%
+  catch.mag.model = catch.fleet %>%
     dplyr::filter(time >= (max.yr - nYrs)) %>%
-    dplyr::group_by(species,fleet,time)%>%
-    dplyr::summarise(catch.model = sum(atoutput,na.rm=T))%>%
-    dplyr::group_by(species,fleet)%>%
-    dplyr::summarise(catch.model = mean(catch.model,na.rm=T))
+    dplyr::group_by(species, fleet, time) %>%
+    dplyr::summarise(catch.model = sum(atoutput, na.rm = T)) %>%
+    dplyr::group_by(species, fleet) %>%
+    dplyr::summarise(catch.model = mean(catch.model, na.rm = T))
 
   catch.mag.ref = catch.ref %>%
-    dplyr::group_by(species,fleet)%>%
-    dplyr::summarise(catch.ref = mean(ref.value,na.rm=T))
-
+    dplyr::group_by(species, fleet) %>%
+    dplyr::summarise(catch.ref = mean(ref.value, na.rm = T))
 
   catch.mag.all = catch.mag.model %>%
-    dplyr::left_join(catch.mag.ref)%>%
-    dplyr::mutate(catch.rel = catch.ref/catch.model,
-                  catch.magnitude = ifelse(catch.rel > (1 - relChangeThreshold) & catch.rel < (1+relChangeThreshold),T,F)
+    dplyr::left_join(catch.mag.ref) %>%
+    dplyr::mutate(
+      catch.rel = catch.ref / catch.model,
+      catch.magnitude = ifelse(
+        catch.rel > (1 - relChangeThreshold) &
+          catch.rel < (1 + relChangeThreshold),
+        T,
+        F
+      )
     )
 
   #distance
-  catch.cog.model =catch.fleet %>%
-    dplyr::filter(time >= (max.yr - nYrs))%>%
-    dplyr::left_join(boxes)%>%
-    dplyr::mutate(catch.wgt.x = inside_long * atoutput,
-                  catch.wgt.y = inside_lat * atoutput)%>%
-    dplyr::group_by(species,fleet,time)%>%
-    dplyr::summarise(cog.x = sum(catch.wgt.x,na.rm=T),
-                     cog.y = sum(catch.wgt.y,na.rm=T),
-                     catch.tot = sum(atoutput,na.rm=T))%>%
-    dplyr::mutate(cog.x = cog.x/catch.tot,
-           cog.y = cog.y/catch.tot)%>%
-    dplyr::group_by(species,fleet)%>%
-    dplyr::summarise(cog.x.model = mean(cog.x, na.rm=T),
-                     cog.y.model = mean(cog.y, na.rm=T))
+  catch.cog.model = catch.fleet %>%
+    dplyr::filter(time >= (max.yr - nYrs)) %>%
+    dplyr::left_join(boxes) %>%
+    dplyr::mutate(
+      catch.wgt.x = inside_long * atoutput,
+      catch.wgt.y = inside_lat * atoutput
+    ) %>%
+    dplyr::group_by(species, fleet, time) %>%
+    dplyr::summarise(
+      cog.x = sum(catch.wgt.x, na.rm = T),
+      cog.y = sum(catch.wgt.y, na.rm = T),
+      catch.tot = sum(atoutput, na.rm = T)
+    ) %>%
+    dplyr::mutate(cog.x = cog.x / catch.tot, cog.y = cog.y / catch.tot) %>%
+    dplyr::group_by(species, fleet) %>%
+    dplyr::summarise(
+      cog.x.model = mean(cog.x, na.rm = T),
+      cog.y.model = mean(cog.y, na.rm = T)
+    )
 
-  catch.cog.ref =catch.ref %>%
-    dplyr::left_join(boxes)%>%
-    dplyr::mutate(catch.wgt.x = inside_long * ref.value,
-                  catch.wgt.y = inside_lat * ref.value)%>%
-    dplyr::group_by(species,fleet)%>%
-    dplyr::summarise(cog.x = sum(catch.wgt.x,na.rm=T),
-                     cog.y = sum(catch.wgt.y,na.rm=T),
-                     catch.tot = sum(ref.value,na.rm=T))%>%
-    dplyr::mutate(cog.x.ref = cog.x/catch.tot,
-           cog.y.ref = cog.y/catch.tot)
+  catch.cog.ref = catch.ref %>%
+    dplyr::left_join(boxes) %>%
+    dplyr::mutate(
+      catch.wgt.x = inside_long * ref.value,
+      catch.wgt.y = inside_lat * ref.value
+    ) %>%
+    dplyr::group_by(species, fleet) %>%
+    dplyr::summarise(
+      cog.x = sum(catch.wgt.x, na.rm = T),
+      cog.y = sum(catch.wgt.y, na.rm = T),
+      catch.tot = sum(ref.value, na.rm = T)
+    ) %>%
+    dplyr::mutate(cog.x.ref = cog.x / catch.tot, cog.y.ref = cog.y / catch.tot)
 
   catch.cog.all = catch.cog.model %>%
-    dplyr::left_join(catch.cog.ref)%>%
-    dplyr::mutate(dist = sqrt((cog.x.ref - cog.x.model)^2 + (cog.y.ref-cog.y.model)^2),
-                  catch.dist = ifelse(dist <= min.dist,T,F))
+    dplyr::left_join(catch.cog.ref) %>%
+    dplyr::mutate(
+      dist = sqrt((cog.x.ref - cog.x.model)^2 + (cog.y.ref - cog.y.model)^2),
+      catch.dist = ifelse(dist <= min.dist, T, F)
+    )
 
   #combine for output
   catch.diag.all = catch.mag.all %>%
-    dplyr::left_join(catch.cog.all)%>%
-    dplyr::select(species,fleet,catch.model,catch.ref, cog.x.model,cog.x.model,cog.x.ref,cog.y.model,cog.y.ref,dist,catch.magnitude,catch.dist)
+    dplyr::left_join(catch.cog.all) %>%
+    dplyr::select(
+      species,
+      fleet,
+      catch.model,
+      catch.ref,
+      cog.x.model,
+      cog.x.model,
+      cog.x.ref,
+      cog.y.model,
+      cog.y.ref,
+      dist,
+      catch.magnitude,
+      catch.dist
+    )
 
   return(catch.diag.all)
 }

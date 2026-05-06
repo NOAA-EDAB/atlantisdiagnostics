@@ -11,21 +11,18 @@
 #'
 #'@noRd
 
-
-
 calc_mef <- function(observed, expected) {
-
   #remove NAs. Exist only in observed data
   expected <- expected[!is.na(observed)]
   observed <- observed[!is.na(observed)]
 
-  oo <- sum((observed-mean(observed))^2)
+  oo <- sum((observed - mean(observed))^2)
   po <- sum((expected - observed)^2)
 
-  mef <- (oo-po)/oo
+  mef <- (oo - po) / oo
 
   # number of data point used in calculation
   n <- length(expected)
 
-  return(list(mef=mef,n=n))
+  return(list(mef = mef, n = n))
 }

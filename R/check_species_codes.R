@@ -11,27 +11,29 @@
 #'
 #' @noRd
 
-check_species_codes <- function(modelBiomass,speciesCodes){
-
+check_species_codes <- function(modelBiomass, speciesCodes) {
   # use default options
   atlantisCodes <- modelBiomass %>%
     dplyr::filter(!is.na(.data$code)) %>%
     dplyr::distinct(.data$code) %>%
     dplyr::pull()
   # use default options
-  if (is.null(speciesCodes)) { # select all species
+  if (is.null(speciesCodes)) {
+    # select all species
     speciesCodes <- atlantisCodes
   } else {
     # remove NA's check for codes not in atlantis
     speciesCodes <- speciesCodes[!is.na(speciesCodes)]
     # check to make sure no non atlantis codes
-    invalidCodes <- base::setdiff(speciesCodes,atlantisCodes)
+    invalidCodes <- base::setdiff(speciesCodes, atlantisCodes)
 
-    if (!(length(invalidCodes)==0)){
-      stop("Invalid Atlantis group codes: ",paste0(invalidCodes,collapse=", "))
+    if (!(length(invalidCodes) == 0)) {
+      stop(
+        "Invalid Atlantis group codes: ",
+        paste0(invalidCodes, collapse = ", ")
+      )
     }
   }
 
   return(speciesCodes)
-
 }
