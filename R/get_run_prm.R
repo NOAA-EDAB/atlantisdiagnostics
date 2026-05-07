@@ -15,26 +15,25 @@
 #'
 #' @export
 
-get_run_prm <- function(runprm, paramName = NULL ){
-
-  if(is.null(paramName)){
+get_run_prm <- function(runprm, paramName = NULL) {
+  if (is.null(paramName)) {
     stop("Please provide a parameter name to extract")
   }
 
   # read n parameter file
-  lines <-  readLines(runprm)
+  lines <- readLines(runprm)
   # identify lines that contain the paramName
-  lineNum <-  grep(paste0("^",paramName," "),lines)
+  lineNum <- grep(paste0("^", paramName, " "), lines)
   # extract the lines
   line <- lines[lineNum]
-  linestr <- unlist(strsplit(line,"#"))[1]
-  linestr <- gsub(paramName,"",linestr)
+  linestr <- unlist(strsplit(line, "#"))[1]
+  linestr <- gsub(paramName, "", linestr)
   linestr <- trimws(linestr)
-  final <- unlist(strsplit(linestr,"\\s+"))
+  final <- unlist(strsplit(linestr, "\\s+"))
   out <- list()
 
   # grepl if any letters of characters
-  if(grepl("[a-zA-Z]",final[1])){
+  if (grepl("[a-zA-Z]", final[1])) {
     stop("You have misspecified the name of the parameter")
   } else {
     value <- as.numeric(final[1])
@@ -43,5 +42,4 @@ get_run_prm <- function(runprm, paramName = NULL ){
   out$unit <- final[2]
 
   return(out)
-
 }

@@ -4,7 +4,7 @@
 
 [![gitleaks](https://github.com/NOAA-EDAB/atlantisdiagnostics/workflows/gitleaks/badge.svg)](https://github.com/NOAA-EDAB/atlantisdiagnostics/actions) 
 [![pkgdown](https://github.com/NOAA-EDAB/atlantisdiagnostics/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/NOAA-EDAB/atlantisdiagnostics/actions/workflows/pkgdown.yaml) [![R-CMD-check](https://github.com/NOAA-EDAB/atlantisdiagnostics/workflows/R-CMD-check/badge.svg)](https://github.com/NOAA-EDAB/atlantisdiagnostics/actions)
-
+[![format-check.yaml](https://github.com/NOAA-EDAB/atlantisdiagnostics/actions/workflows/format-check.yaml/badge.svg)](https://github.com/NOAA-EDAB/atlantisdiagnostics/actions/workflows/format-check.yaml)
 <!-- badges: end -->
 
 The diagnostics package primarily focuses on two aspects:

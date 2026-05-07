@@ -10,31 +10,32 @@
 #'
 #' @export
 
-get_param_move_temp <- function(bio.prm){
-
+get_param_move_temp <- function(bio.prm) {
   # read n parameter file
   bio.lines = readLines(bio.prm)
   # identify lines that contain the min_move_temp and max_move_temp values
-  line = grep(paste0("_move_temp"),bio.lines)
+  line = grep(paste0("_move_temp"), bio.lines)
   # extract the lines
   lines <- bio.lines[line]
 
-
   # create a null dataframe
-  out.df = data.frame(group = NULL,value = NULL,limit = NULL)
+  out.df = data.frame(group = NULL, value = NULL, limit = NULL)
   # loop through the lines and extract the values, groups and the min/max
-  for (i in 1:length(lines)){
-    linesi <- gsub("_move_temp","",lines[i])
-    splitline <- strsplit(linesi,"\\s+")
+  for (i in 1:length(lines)) {
+    linesi <- gsub("_move_temp", "", lines[i])
+    splitline <- strsplit(linesi, "\\s+")
     value <- as.numeric(splitline[[1]][2])
     grouplimit <- splitline[[1]][1]
-    if(grepl("_min",grouplimit)) {
+    if (grepl("_min", grouplimit)) {
       lim <- "min"
-    } else if(grepl("_max",grouplimit)) {
+    } else if (grepl("_max", grouplimit)) {
       lim <- "max"
     }
-    group <- gsub("_min|_max","",grouplimit)
-    out.df <- rbind(out.df,data.frame(group = group,value = value,limit = lim))
+    group <- gsub("_min|_max", "", grouplimit)
+    out.df <- rbind(
+      out.df,
+      data.frame(group = group, value = value, limit = lim)
+    )
   }
 
   out.df <- tibble::as_tibble(out.df)

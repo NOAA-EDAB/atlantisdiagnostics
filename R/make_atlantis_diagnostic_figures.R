@@ -43,40 +43,38 @@
 #' Author: Ryan Morse, modified by J. Caracappa
 #' @export
 
-
-make_atlantis_diagnostic_figures = function(out.dir,
-                                            fig.dir,
-                                            atl.dir,
-                                            param.dir,
-                                            run.prefix,
-                                            run.name,
-                                            param.ls,
-                                            benthic.box,
-                                            benthic.level= 4,
-                                            plot.all,
-                                            plot.benthic,
-                                            plot.overall.biomass,
-                                            plot.biomass.timeseries,
-                                            plot.length.age,
-                                            plot.biomass.box,
-                                            plot.c.mum,
-                                            plot.sn.rn,
-                                            plot.recruits,
-                                            plot.numbers.timeseries,
-                                            plot.physics,
-                                            plot.growth.cons,
-                                            plot.cohort,
-                                            plot.diet,
-                                            plot.consumption,
-                                            plot.spatial.biomass,
-                                            plot.spatial.biomass.seasonal,
-                                            plot.catch,
-                                            plot.spatial.catch,
-                                            plot.weight,
-                                            plot.mortality){
-
-
-
+make_atlantis_diagnostic_figures = function(
+  out.dir,
+  fig.dir,
+  atl.dir,
+  param.dir,
+  run.prefix,
+  run.name,
+  param.ls,
+  benthic.box,
+  benthic.level = 4,
+  plot.all,
+  plot.benthic,
+  plot.overall.biomass,
+  plot.biomass.timeseries,
+  plot.length.age,
+  plot.biomass.box,
+  plot.c.mum,
+  plot.sn.rn,
+  plot.recruits,
+  plot.numbers.timeseries,
+  plot.physics,
+  plot.growth.cons,
+  plot.cohort,
+  plot.diet,
+  plot.consumption,
+  plot.spatial.biomass,
+  plot.spatial.biomass.seasonal,
+  plot.catch,
+  plot.spatial.catch,
+  plot.weight,
+  plot.mortality
+) {
   param.dir <- check_string(param.dir)
   atl.dir <- check_string(atl.dir)
   out.dir <- check_string(out.dir)
@@ -85,33 +83,49 @@ make_atlantis_diagnostic_figures = function(out.dir,
   #Load groups data
   group.code = atlantistools::get_age_acronyms(param.ls$groups.file)
   group.data = atlantistools::load_fgs(param.ls$groups.file)
-  group.index = dplyr::select(group.data,c(Code,LongName))
-
+  group.index = dplyr::select(group.data, c(Code, LongName))
 
   #Load BGM data
   box.bgm = atlantistools::load_box(param.ls$bgm)
 
   #plot parameters
-  plot.labels = list(x = 'Time (years)',y = 'Biomass (tonnes)')
-
+  plot.labels = list(x = 'Time (years)', y = 'Biomass (tonnes)')
 
   # Benthic box timeseries --------------------------------------------------
 
-
   #Select box for timeseries of all benthic groups
-  if(plot.benthic |plot.all){
+  if (plot.benthic | plot.all) {
     print("benthic")
-    biomass.spatial.stanza = readRDS(file.path(out.dir,'biomass_spatial_stanza.rds'))
-    benthic.biomass.spatial = dplyr::filter(biomass.spatial.stanza, layer == benthic.level & polygon == benthic.box)
+    biomass.spatial.stanza = readRDS(file.path(
+      out.dir,
+      'biomass_spatial_stanza.rds'
+    ))
+    benthic.biomass.spatial = dplyr::filter(
+      biomass.spatial.stanza,
+      layer == benthic.level & polygon == benthic.box
+    )
     benthic.spp = unique(benthic.biomass.spatial$species)
-    box.area = box.bgm$boxes[[benthic.box+1]]$area
+    box.area = box.bgm$boxes[[benthic.box + 1]]$area
 
-    pdf(file = file.path(fig.dir,paste0(run.name, ' Box_',benthic.box,'_benthos.pdf')))
-    for(i in 1:length(benthic.spp)){
+    pdf(
+      file = file.path(
+        fig.dir,
+        paste0(run.name, ' Box_', benthic.box, '_benthos.pdf')
+      )
+    )
+    for (i in 1:length(benthic.spp)) {
       spp.ind = benthic.spp[i]
-      benthic.biomass.spp = dplyr::filter(benthic.biomass.spatial,species == spp.ind)
-      plot(benthic.biomass.spp$atoutput/box.area~benthic.biomass.spp$time,
-           type= 'l',main = paste(spp.ind,'Box',benthic.box),ylab = 'Mg N m-2',xlab = 'Time')
+      benthic.biomass.spp = dplyr::filter(
+        benthic.biomass.spatial,
+        species == spp.ind
+      )
+      plot(
+        benthic.biomass.spp$atoutput / box.area ~ benthic.biomass.spp$time,
+        type = 'l',
+        main = paste(spp.ind, 'Box', benthic.box),
+        ylab = 'Mg N m-2',
+        xlab = 'Time'
+      )
     }
     dev.off()
 
@@ -120,56 +134,83 @@ make_atlantis_diagnostic_figures = function(out.dir,
 
   # Catch Timeseries ------------------------------------------------------
 
-  if(plot.catch|plot.all) {
+  if (plot.catch | plot.all) {
     print("Catch")
-    catchmt = readRDS(file.path(out.dir,'catchmt.rds'))
+    catchmt = readRDS(file.path(out.dir, 'catchmt.rds'))
 
     #Catch by species time series (metric tonnes)
     temp.plot.1 = atlantistools::plot_line(catchmt)
-    temp.plot.1 = ggplot2::update_labels(temp.plot.1,labels = plot.labels)
-    temp.plot.1 = ggplot2::update_labels(temp.plot.1,labels = list(x='Time (years)', y = 'Metric Tonnes'))
-    temp.plot.1 = add.title(temp.plot.1,'Catch')
+    temp.plot.1 = ggplot2::update_labels(temp.plot.1, labels = plot.labels)
+    temp.plot.1 = ggplot2::update_labels(
+      temp.plot.1,
+      labels = list(x = 'Time (years)', y = 'Metric Tonnes')
+    )
+    temp.plot.1 = add.title(temp.plot.1, 'Catch')
 
     #Catch at age time series (numbers)
 
-    totcatch = readRDS(file.path(out.dir,'totcatch.rds'))
+    totcatch = readRDS(file.path(out.dir, 'totcatch.rds'))
 
     temp.plot.2 = atlantistools::plot_line(totcatch, col = 'agecl')
-    temp.plot.2 = ggplot2::update_labels(p = temp.plot.2, labels = c(plot.labels, list(colour = 'Ageclas')))
-    temp.plot.2 = ggplot2::update_labels(temp.plot.2,labels = list(x='Time (years)', y = 'Numbers'))
-    temp.plot.2 = add.title(temp.plot.2,'Catch at Age')
+    temp.plot.2 = ggplot2::update_labels(
+      p = temp.plot.2,
+      labels = c(plot.labels, list(colour = 'Ageclas'))
+    )
+    temp.plot.2 = ggplot2::update_labels(
+      temp.plot.2,
+      labels = list(x = 'Time (years)', y = 'Numbers')
+    )
+    temp.plot.2 = add.title(temp.plot.2, 'Catch at Age')
 
     #Catch at age - percent
-    catch.age.pct = atlantistools::agg_perc(totcatch, groups = c('time','species'))
-    temp.plot.6 = atlantistools::plot_bar(catch.age.pct, fill = 'agecl', wrap = 'species')
-    temp.plot.6 = ggplot2::update_labels(temp.plot.6,labels = list(x='Time (years)', y = 'Numbers (%)'))
+    catch.age.pct = atlantistools::agg_perc(
+      totcatch,
+      groups = c('time', 'species')
+    )
+    temp.plot.6 = atlantistools::plot_bar(
+      catch.age.pct,
+      fill = 'agecl',
+      wrap = 'species'
+    )
+    temp.plot.6 = ggplot2::update_labels(
+      temp.plot.6,
+      labels = list(x = 'Time (years)', y = 'Numbers (%)')
+    )
     temp.plot.6 = add.title(temp.plot.6, 'Catch at age - Percent')
 
-    pdf(file.path(fig.dir,paste0(run.name,' Catch Timeseries.pdf')),width = 20, height = 20, onefile = T)
+    pdf(
+      file.path(fig.dir, paste0(run.name, ' Catch Timeseries.pdf')),
+      width = 20,
+      height = 20,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
     gridExtra::grid.arrange(temp.plot.2)
     gridExtra::grid.arrange(temp.plot.6)
     dev.off()
 
-    rm(totcatch,catchmt)
+    rm(totcatch, catchmt)
   }
 
   # Mortality Timeseries ------------------------------------------------------
 
-  if(plot.mortality|plot.all) {
+  if (plot.mortality | plot.all) {
     print("mortality")
     # plot mortality from Mort.txt
-    mort = readRDS(file.path(out.dir,'mort.rds'))
+    mort = readRDS(file.path(out.dir, 'mort.rds'))
     itype <- 1
     plotMort <- list()
     # Annual Mortality time series M, F by species on same plot
-    temp.plot.1 = atlantistools::plot_line(mort,col="source")
-    temp.plot.1 = ggplot2::update_labels(temp.plot.1,labels = list(x='Time (years)', y = 'Mortality'))
-    temp.plot.1 = add.title(temp.plot.1,'Mortality (F & M2)')
+    temp.plot.1 = atlantistools::plot_line(mort, col = "source")
+    temp.plot.1 = ggplot2::update_labels(
+      temp.plot.1,
+      labels = list(x = 'Time (years)', y = 'Mortality')
+    )
+    temp.plot.1 = add.title(temp.plot.1, 'Mortality (F & M2)')
     plotMort[[itype]] <- temp.plot.1
 
     # plot mortaliy from specificMort.txt
-    specificmort <- readRDS(file.path(out.dir,'specificmort.rds'))
+    specificmort <- readRDS(file.path(out.dir, 'specificmort.rds'))
 
     # plot absolute mortality. 3 pages, one page for F,M1,M2
     for (atype in rev(unique(specificmort$mort))) {
@@ -177,20 +218,27 @@ make_atlantis_diagnostic_figures = function(out.dir,
       mort <- specificmort %>%
         dplyr::filter(mort == atype)
       temp.plot = atlantistools::plot_line(mort, col = 'agecl')
-      temp.plot = ggplot2::update_labels(p = temp.plot, labels = c(list(x='Time (years)', y = 'Mortality'), list(colour = 'Ageclas')))
-      temp.plot = add.title(temp.plot,paste0('Mortality at Age (',atype,')'))
+      temp.plot = ggplot2::update_labels(
+        p = temp.plot,
+        labels = c(
+          list(x = 'Time (years)', y = 'Mortality'),
+          list(colour = 'Ageclas')
+        )
+      )
+      temp.plot = add.title(temp.plot, paste0('Mortality at Age (', atype, ')'))
 
       plotMort[[itype]] <- temp.plot
-
     }
 
     # find all species with numCohorts > 2 and <= max(specificmort$agecl)
     allCodes <- NULL
     for (kages in 3:max(specificmort$agecl)) {
-      codes <- atlantistools::get_cohorts_acronyms(param.ls$groups.file,numCohorts = kages)
-      allCodes <- c(allCodes,codes)
+      codes <- atlantistools::get_cohorts_acronyms(
+        param.ls$groups.file,
+        numCohorts = kages
+      )
+      allCodes <- c(allCodes, codes)
     }
-
 
     # plot relative mortality by age class
     # select species with 10 age classes
@@ -199,11 +247,23 @@ make_atlantis_diagnostic_figures = function(out.dir,
         dplyr::filter(code %in% allCodes) %>%
         dplyr::filter(agecl == iage)
 
-      pct = atlantistools::agg_perc(mortality, groups = c('time','species'))
+      pct = atlantistools::agg_perc(mortality, groups = c('time', 'species'))
       temp.plot = atlantistools::plot_bar(pct, fill = 'mort', wrap = 'species')
-      temp.plot = ggplot2::update_labels(temp.plot,labels = list(x='Time (years)', y = 'Rate (proportion)'))+
-        ggplot2::scale_y_continuous(labels = scales::label_number(accuracy = 0.01))
-      temp.plot = add.title(temp.plot, paste0("Relative Mortality Rates for species with 10 age classes (Age ",iage, ")"))
+      temp.plot = ggplot2::update_labels(
+        temp.plot,
+        labels = list(x = 'Time (years)', y = 'Rate (proportion)')
+      ) +
+        ggplot2::scale_y_continuous(
+          labels = scales::label_number(accuracy = 0.01)
+        )
+      temp.plot = add.title(
+        temp.plot,
+        paste0(
+          "Relative Mortality Rates for species with 10 age classes (Age ",
+          iage,
+          ")"
+        )
+      )
 
       plotMort[[itype + iage]] <- temp.plot
     }
@@ -211,118 +271,195 @@ make_atlantis_diagnostic_figures = function(out.dir,
     # select species with 2 age classes
     for (i2age in 1:2) {
       mortality <- specificmort %>%
-        dplyr::filter(code %in% atlantistools::get_cohorts_acronyms(param.ls$groups.file,numCohorts = 2)) %>%
+        dplyr::filter(
+          code %in%
+            atlantistools::get_cohorts_acronyms(
+              param.ls$groups.file,
+              numCohorts = 2
+            )
+        ) %>%
         dplyr::filter(agecl == i2age)
 
-      pct = atlantistools::agg_perc(mortality, groups = c('time','species'))
+      pct = atlantistools::agg_perc(mortality, groups = c('time', 'species'))
       temp.plot = atlantistools::plot_bar(pct, fill = 'mort', wrap = 'species')
-      temp.plot = ggplot2::update_labels(temp.plot,labels = list(x='Time (years)', y = 'Rate (proportion)'))+
-        ggplot2::scale_y_continuous(labels = scales::label_number(accuracy = 0.01))
-      temp.plot = add.title(temp.plot, paste0("Relative Mortality Rates for species with 2 age classes (Age ",i2age, ")"))
+      temp.plot = ggplot2::update_labels(
+        temp.plot,
+        labels = list(x = 'Time (years)', y = 'Rate (proportion)')
+      ) +
+        ggplot2::scale_y_continuous(
+          labels = scales::label_number(accuracy = 0.01)
+        )
+      temp.plot = add.title(
+        temp.plot,
+        paste0(
+          "Relative Mortality Rates for species with 2 age classes (Age ",
+          i2age,
+          ")"
+        )
+      )
 
       plotMort[[itype + iage + i2age]] <- temp.plot
     }
 
     # select species with 1 age classes (Biomass pool)
     mortality <- specificmort %>%
-      dplyr::filter(code %in% atlantistools::get_cohorts_acronyms(param.ls$groups.file,numCohorts = 1)) %>%
+      dplyr::filter(
+        code %in%
+          atlantistools::get_cohorts_acronyms(
+            param.ls$groups.file,
+            numCohorts = 1
+          )
+      ) %>%
       dplyr::filter(agecl == 1)
 
-    pct = atlantistools::agg_perc(mortality, groups = c('time','species'))
+    pct = atlantistools::agg_perc(mortality, groups = c('time', 'species'))
     temp.plot = atlantistools::plot_bar(pct, fill = 'mort', wrap = 'species')
-    temp.plot = ggplot2::update_labels(temp.plot,labels = list(x='Time (years)', y = 'Rate (proportion)'))+
-      ggplot2::scale_y_continuous(labels = scales::label_number(accuracy = 0.01))
-    temp.plot = add.title(temp.plot, paste0("Relative Mortality Rates for species with 1 age class (Age 1) "))
+    temp.plot = ggplot2::update_labels(
+      temp.plot,
+      labels = list(x = 'Time (years)', y = 'Rate (proportion)')
+    ) +
+      ggplot2::scale_y_continuous(
+        labels = scales::label_number(accuracy = 0.01)
+      )
+    temp.plot = add.title(
+      temp.plot,
+      paste0("Relative Mortality Rates for species with 1 age class (Age 1) ")
+    )
 
     plotMort[[itype + iage + i2age + 1]] <- temp.plot
 
-
-
-    pdf(file.path(fig.dir,paste0(run.name,' Specific Mortality Timeseries.pdf')),width = 20, height = 20, onefile = T)
-    for (iplot in 1:(itype+iage+i2age+1)) {
+    pdf(
+      file.path(
+        fig.dir,
+        paste0(run.name, ' Specific Mortality Timeseries.pdf')
+      ),
+      width = 20,
+      height = 20,
+      onefile = T
+    )
+    for (iplot in 1:(itype + iage + i2age + 1)) {
       gridExtra::grid.arrange(plotMort[[iplot]])
     }
     dev.off()
 
-
-    rm(mort,specificmort)
+    rm(mort, specificmort)
   }
 
   # Overall biomass ---------------------------------------------------------
 
-
   #Make overall biomass plot (stacked barplot of total biomass domain-wide)
-  if(plot.overall.biomass|plot.all){
+  if (plot.overall.biomass | plot.all) {
     print("biomass overall")
-    biomass = readRDS(file.path(out.dir,'biomass.rds'))
+    biomass = readRDS(file.path(out.dir, 'biomass.rds'))
 
     #combine threshold = 10
-    biomass.df.10 = atlantistools::combine_groups(biomass, group_col = 'species', combine_thresh = 10)
+    biomass.df.10 = atlantistools::combine_groups(
+      biomass,
+      group_col = 'species',
+      combine_thresh = 10
+    )
     temp.plot.1 = atlantistools::plot_bar(biomass.df.10)
     temp.plot.1 = temp.plot.1 + ggplot2::ggtitle('Top 10 Groups')
     temp.plot.1 = ggplot2::update_labels(temp.plot.1, labels = plot.labels)
 
     #Combine threshold = 20
-    biomass.df.20 = atlantistools::combine_groups(biomass, group_col = 'species', combine_thresh = 20)
+    biomass.df.20 = atlantistools::combine_groups(
+      biomass,
+      group_col = 'species',
+      combine_thresh = 20
+    )
     temp.plot.2 = atlantistools::plot_bar(biomass.df.20)
     temp.plot.2 = temp.plot.2 + ggplot2::ggtitle('Top 20 Groups')
     temp.plot.2 = ggplot2::update_labels(temp.plot.2, labels = plot.labels)
 
-    pdf(file = file.path(fig.dir,paste0(run.name,' overall biomass.pdf')),width = 12, height = 6, onefile = T)
+    pdf(
+      file = file.path(fig.dir, paste0(run.name, ' overall biomass.pdf')),
+      width = 12,
+      height = 6,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
     gridExtra::grid.arrange(temp.plot.2)
     dev.off()
   }
 
-
   # Biomass Timeseries ------------------------------------------------------
 
-
   #Make biomass timeseries plots
-  if(plot.biomass.timeseries|plot.all){
+  if (plot.biomass.timeseries | plot.all) {
     print("biomass ")
-    biomass = readRDS(file.path(out.dir,'biomass.rds'))
+    biomass = readRDS(file.path(out.dir, 'biomass.rds'))
 
     #biomass by species timeseries
     temp.plot.1 = atlantistools::plot_line(biomass)
-    temp.plot.1 = ggplot2::update_labels(temp.plot.1,labels = plot.labels)
-    temp.plot.1 = add.title(temp.plot.1,'Biomass')
+    temp.plot.1 = ggplot2::update_labels(temp.plot.1, labels = plot.labels)
+    temp.plot.1 = add.title(temp.plot.1, 'Biomass')
 
     #biomass at age timeseries
-    biomass.age = readRDS(file.path(out.dir,'biomass_age.rds'))
+    biomass.age = readRDS(file.path(out.dir, 'biomass_age.rds'))
 
     temp.plot.2 = atlantistools::plot_line(biomass.age, col = 'agecl')
-    temp.plot.2 = ggplot2::update_labels(p = temp.plot.2, labels = c(plot.labels, list(colour = 'Ageclas')))
-    temp.plot.2 = add.title(temp.plot.2,'Biomass at Age')
+    temp.plot.2 = ggplot2::update_labels(
+      p = temp.plot.2,
+      labels = c(plot.labels, list(colour = 'Ageclas'))
+    )
+    temp.plot.2 = add.title(temp.plot.2, 'Biomass at Age')
 
     #biomass at age relative to initial biomass timeseries
     rel.biomass.age = atlantistools::convert_relative_initial(biomass.age)
     temp.plot.3 = atlantistools::plot_line(rel.biomass.age, col = 'agecl')
-    temp.plot.3 = ggplot2::update_labels(temp.plot.3,list(x = 'Time (years)', y = expression(biomass/bio[init])))
+    temp.plot.3 = ggplot2::update_labels(
+      temp.plot.3,
+      list(x = 'Time (years)', y = expression(biomass / bio[init]))
+    )
     temp.plot.3 = atlantistools::plot_add_box(temp.plot.3)
-    temp.plot.3 = add.title(temp.plot.3,'Biomass at Age Relatative to Initial Biomass')
+    temp.plot.3 = add.title(
+      temp.plot.3,
+      'Biomass at Age Relatative to Initial Biomass'
+    )
 
     #Biomass vs Bio init
     rel.biomass = atlantistools::convert_relative_initial(biomass)
     temp.plot.4 = atlantistools::plot_line(rel.biomass)
-    temp.plot.4 = ggplot2::update_labels(temp.plot.4,list(x = 'Time (years)',y = expression (Biomass/Biomass[init])))
+    temp.plot.4 = ggplot2::update_labels(
+      temp.plot.4,
+      list(x = 'Time (years)', y = expression(Biomass / Biomass[init]))
+    )
     temp.plot.4 = atlantistools::plot_add_box(temp.plot.4)
-    temp.plot.4 = add.title(temp.plot.4,'Biomass Relatative to Initial Biomass')
+    temp.plot.4 = add.title(
+      temp.plot.4,
+      'Biomass Relatative to Initial Biomass'
+    )
 
     #Invert bio timeseries
-    biomass.age.invert = readRDS(file.path(out.dir,'biomass_age_invert.rds'))
+    biomass.age.invert = readRDS(file.path(out.dir, 'biomass_age_invert.rds'))
 
     temp.plot.5 = atlantistools::plot_line(biomass.age.invert)
     temp.plot.5 = ggplot2::update_labels(temp.plot.5, labels = plot.labels)
-    temp.plot.5 = add.title(temp.plot.5,'Invert Biomass')
+    temp.plot.5 = add.title(temp.plot.5, 'Invert Biomass')
 
     #Bio at age
-    bio.age.pct = atlantistools::agg_perc(biomass.age, groups = c('time','species'))
-    temp.plot.6 = atlantistools::plot_bar(bio.age.pct, fill = 'agecl', wrap = 'species')
-    temp.plot.6 = ggplot2::update_labels(temp.plot.6,labels = list(x='Time (years)', y = 'Numbers (%)'))
+    bio.age.pct = atlantistools::agg_perc(
+      biomass.age,
+      groups = c('time', 'species')
+    )
+    temp.plot.6 = atlantistools::plot_bar(
+      bio.age.pct,
+      fill = 'agecl',
+      wrap = 'species'
+    )
+    temp.plot.6 = ggplot2::update_labels(
+      temp.plot.6,
+      labels = list(x = 'Time (years)', y = 'Numbers (%)')
+    )
     temp.plot.6 = add.title(temp.plot.6, 'Biomass at age - Percent')
 
-    pdf(file.path(fig.dir,paste0(run.name,' biomass timeseries.pdf')),width = 20, height = 20, onefile = T)
+    pdf(
+      file.path(fig.dir, paste0(run.name, ' biomass timeseries.pdf')),
+      width = 20,
+      height = 20,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
     gridExtra::grid.arrange(temp.plot.2)
     gridExtra::grid.arrange(temp.plot.3)
@@ -331,50 +468,82 @@ make_atlantis_diagnostic_figures = function(out.dir,
     gridExtra::grid.arrange(temp.plot.6)
     dev.off()
 
-    rm(biomass,biomass.age,biomass.age.invert)
+    rm(biomass, biomass.age, biomass.age.invert)
   }
-
 
   # Length-age plots --------------------------------------------------------
 
-
   #Make length.age plots
-  if(plot.length.age|plot.all){
+  if (plot.length.age | plot.all) {
     print("length age")
-    length.age = readRDS(file.path(out.dir,'length_age.rds'))
+    length.age = readRDS(file.path(out.dir, 'length_age.rds'))
 
     #Length at age ts by spp
     # init.length.old = read.csv(paste0(param.dir,'/vertebrate_init_length_cm.csv'),header =T, stringsAsFactors = F)
-    init.length = read.csv(file.path(param.dir,'vertebrate_init_length_cm_Adjusted.csv'),header =T, stringsAsFactors = F)%>%
-      dplyr::select(Code,species,agecl,new.length.ref) %>%
-      tidyr::spread(agecl,new.length.ref)
-    init.length = init.length[order(init.length$species),]
+    init.length = read.csv(
+      file.path(param.dir, 'vertebrate_init_length_cm_Adjusted.csv'),
+      header = T,
+      stringsAsFactors = F
+    ) %>%
+      dplyr::select(Code, species, agecl, new.length.ref) %>%
+      tidyr::spread(agecl, new.length.ref)
+    init.length = init.length[order(init.length$species), ]
     spp.names = unique(length.age$species)
 
-    pdf(file = file.path(fig.dir,paste0(run.name,' tuning length at age by species.pdf')),width = 12, height = 6, onefile = T)
-    for(x in 1:length(spp.names)){
+    pdf(
+      file = file.path(
+        fig.dir,
+        paste0(run.name, ' tuning length at age by species.pdf')
+      ),
+      width = 12,
+      height = 6,
+      onefile = T
+    )
+    for (x in 1:length(spp.names)) {
       spp.id = spp.names[x]
-      length.age.spp = dplyr::filter(length.age, species == spp.id & time >0)
-      init.length.age.spp = dplyr::filter(init.length[,2:12],species == spp.id)
-      boxplot(length.age.spp$atoutput ~ length.age.spp$agecl, ylab = 'cm',xlab = 'cohort',
-              main = spp.id, ylim = c(0,max(length.age.spp$atoutput)))
-      points(seq(1:10),init.length.age.spp[2:11],col = 'red',pch= 17)
+      length.age.spp = dplyr::filter(length.age, species == spp.id & time > 0)
+      init.length.age.spp = dplyr::filter(
+        init.length[, 2:12],
+        species == spp.id
+      )
+      boxplot(
+        length.age.spp$atoutput ~ length.age.spp$agecl,
+        ylab = 'cm',
+        xlab = 'cohort',
+        main = spp.id,
+        ylim = c(0, max(length.age.spp$atoutput))
+      )
+      points(seq(1:10), init.length.age.spp[2:11], col = 'red', pch = 17)
     }
     dev.off()
 
     #Length age together
-    temp.plot.1 = atlantistools::plot_line(length.age,col = 'agecl')
-    temp.plot.1 = ggplot2::update_labels(temp.plot.1,labels = c(x = 'Time (years)',y = 'Length (cm)', colour = 'Ageclass'))
-    temp.plot.1 = add.title(temp.plot.1,'Length-at-age')
+    temp.plot.1 = atlantistools::plot_line(length.age, col = 'agecl')
+    temp.plot.1 = ggplot2::update_labels(
+      temp.plot.1,
+      labels = c(x = 'Time (years)', y = 'Length (cm)', colour = 'Ageclass')
+    )
+    temp.plot.1 = add.title(temp.plot.1, 'Length-at-age')
 
     #Length at age vs. length init
     rel.length.age = atlantistools::convert_relative_initial(length.age)
-    temp.plot.2 = atlantistools::plot_line(rel.length.age,col = 'agecl')
-    temp.plot.2 = ggplot2::update_labels(temp.plot.2,list(x='Time (years)',y = expression(length/length[init])))
+    temp.plot.2 = atlantistools::plot_line(rel.length.age, col = 'agecl')
+    temp.plot.2 = ggplot2::update_labels(
+      temp.plot.2,
+      list(x = 'Time (years)', y = expression(length / length[init]))
+    )
     atlantistools::plot_add_box(temp.plot.2)
-    temp.plot.2 = add.title(temp.plot.2,'Length at Age vs. Initial Length')
+    temp.plot.2 = add.title(temp.plot.2, 'Length at Age vs. Initial Length')
 
-    pdf(file = file.path(fig.dir,paste0(run.name,' Length at Age Timeseries.pdf')),width = 16, height = 16, onefile = T)
+    pdf(
+      file = file.path(
+        fig.dir,
+        paste0(run.name, ' Length at Age Timeseries.pdf')
+      ),
+      width = 16,
+      height = 16,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
     gridExtra::grid.arrange(temp.plot.2)
     dev.off()
@@ -383,63 +552,91 @@ make_atlantis_diagnostic_figures = function(out.dir,
   }
 
   # Max weight by age class
-  if(plot.weight|plot.all){
+  if (plot.weight | plot.all) {
     print("max weight")
-    maxSize <- readRDS(file.path(out.dir,'max_weight.rds'))
+    maxSize <- readRDS(file.path(out.dir, 'max_weight.rds'))
     ageClasses <- 1:max(maxSize$agecl)
     maxSize <- maxSize %>%
-      dplyr::group_by(species,agecl) %>%
-      dplyr::summarize(mm=max(maxMeanWeight)/1000,.groups="drop") %>% # convert to kilograms
+      dplyr::group_by(species, agecl) %>%
+      dplyr::summarize(mm = max(maxMeanWeight) / 1000, .groups = "drop") %>% # convert to kilograms
       dplyr::mutate(agecl = as.factor(agecl))
 
-    weight.plot <- atlantistools:::custom_map(data = maxSize, x = "agecl", y = "mm") +
+    weight.plot <- atlantistools:::custom_map(
+      data = maxSize,
+      x = "agecl",
+      y = "mm"
+    ) +
       ggplot2::geom_bar(stat = "identity") +
       atlantistools::theme_atlantis()
-    weight.plot <- atlantistools:::custom_wrap( weight.plot, col = "species", ncol = 7)
+    weight.plot <- atlantistools:::custom_wrap(
+      weight.plot,
+      col = "species",
+      ncol = 7
+    )
 
-    weight.plot <- atlantistools:::ggplot_custom( weight.plot) +
+    weight.plot <- atlantistools:::ggplot_custom(weight.plot) +
       ggplot2::scale_y_continuous(labels = scales::label_number(accuracy = 0.1))
-    weight.plot <- ggplot2::update_labels( weight.plot,labels = list(x='Age Class', y = 'Weight (Kg)'))
-    weight.plot <-  add.title( weight.plot, paste0("Maximum Weight"))
-    weight.plot <-  weight.plot + ggplot2::scale_x_discrete(labels = dput(as.character(ageClasses)))
+    weight.plot <- ggplot2::update_labels(
+      weight.plot,
+      labels = list(x = 'Age Class', y = 'Weight (Kg)')
+    )
+    weight.plot <- add.title(weight.plot, paste0("Maximum Weight"))
+    weight.plot <- weight.plot +
+      ggplot2::scale_x_discrete(labels = dput(as.character(ageClasses)))
 
-
-    pdf(file = file.path(fig.dir,paste0(run.name,' Max Weight.pdf')),width = 20, height = 20, onefile = T)
+    pdf(
+      file = file.path(fig.dir, paste0(run.name, ' Max Weight.pdf')),
+      width = 20,
+      height = 20,
+      onefile = T
+    )
     gridExtra::grid.arrange(weight.plot)
     dev.off()
-
 
     rm(maxSize)
   }
 
-
-
   # Biomass box plots -------------------------------------------------------
 
-
   #Make Biomass Box plots
-  if(plot.biomass.box|plot.all){
+  if (plot.biomass.box | plot.all) {
     print("biomass box")
-    biomass.box = readRDS(file.path(out.dir,'biomass_box.rds'))
+    biomass.box = readRDS(file.path(out.dir, 'biomass_box.rds'))
     #Bio per box
     temp.plot.1 = atlantistools::plot_line(biomass.box)
-    temp.plot.1 = ggplot2::update_labels(temp.plot.1,plot.labels)
-    temp.plot.1 = atlantistools::custom_grid(temp.plot.1, grid_x = 'polygon',grid_y = 'species')
-    temp.plot.1 = add.title(temp.plot.1,'Biomass by Box')
+    temp.plot.1 = ggplot2::update_labels(temp.plot.1, plot.labels)
+    temp.plot.1 = atlantistools::custom_grid(
+      temp.plot.1,
+      grid_x = 'polygon',
+      grid_y = 'species'
+    )
+    temp.plot.1 = add.title(temp.plot.1, 'Biomass by Box')
 
     #Invert bio by box
-    biomass.box.invert = readRDS(file.path(out.dir,'biomass_box_invert.rds'))
+    biomass.box.invert = readRDS(file.path(out.dir, 'biomass_box_invert.rds'))
     temp.plot.2 = atlantistools::plot_line(biomass.box.invert)
-    temp.plot.2 = ggplot2::update_labels(temp.plot.2,plot.labels)
-    temp.plot.2 = atlantistools::custom_grid(temp.plot.2,grid_x = 'polygon',grid_y = 'species')
+    temp.plot.2 = ggplot2::update_labels(temp.plot.2, plot.labels)
+    temp.plot.2 = atlantistools::custom_grid(
+      temp.plot.2,
+      grid_x = 'polygon',
+      grid_y = 'species'
+    )
     temp.plot.2 = add.title(temp.plot.2, 'Invert Biomass by Box')
 
-    pdf(file = file.path(fig.dir,paste0(run.name,' Biomass Box Timeseries.pdf')),width = 48, height = 60, onefile =T)
+    pdf(
+      file = file.path(
+        fig.dir,
+        paste0(run.name, ' Biomass Box Timeseries.pdf')
+      ),
+      width = 48,
+      height = 60,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
     gridExtra::grid.arrange(temp.plot.2)
     dev.off()
 
-    rm(biomass.box,biomass.box.invert)
+    rm(biomass.box, biomass.box.invert)
   }
 
   #   #C_Mum tuning
@@ -574,63 +771,82 @@ make_atlantis_diagnostic_figures = function(out.dir,
   #     rm(RN.age,SN.age)
   #   }
 
-
   # SN/RN plots -------------------------------------------------------------
 
   #SN/RN plots
-  if(plot.sn.rn|plot.all){
+  if (plot.sn.rn | plot.all) {
     print("sn,rn")
-    SN.box = readRDS(file.path(out.dir,'SN_box.rds'))
-    RN.box = readRDS(file.path(out.dir,'RN_box.rds'))
-    RN.age = readRDS(file.path(out.dir,'RN_age.rds'))
-    SN.age = readRDS(file.path(out.dir,'SN_age.rds'))
+    SN.box = readRDS(file.path(out.dir, 'SN_box.rds'))
+    RN.box = readRDS(file.path(out.dir, 'RN_box.rds'))
+    RN.age = readRDS(file.path(out.dir, 'RN_age.rds'))
+    SN.age = readRDS(file.path(out.dir, 'SN_age.rds'))
 
     #SN per box
     temp.plot.1 = atlantistools::plot_line(SN.box)
-    temp.plot.1 = atlantistools::custom_grid(temp.plot.1,grid_x = 'polygon', grid_y = 'species')
-    temp.plot.1 = add.title(temp.plot.1,'SN by Box')
+    temp.plot.1 = atlantistools::custom_grid(
+      temp.plot.1,
+      grid_x = 'polygon',
+      grid_y = 'species'
+    )
+    temp.plot.1 = add.title(temp.plot.1, 'SN by Box')
 
     #RN per box
     temp.plot.2 = atlantistools::plot_line(RN.box)
-    temp.plot.2 = atlantistools::custom_grid(temp.plot.2,grid_x = 'polygon', grid_y = 'species')
-    temp.plot.2 = add.title(temp.plot.2,'RN by Box')
+    temp.plot.2 = atlantistools::custom_grid(
+      temp.plot.2,
+      grid_x = 'polygon',
+      grid_y = 'species'
+    )
+    temp.plot.2 = add.title(temp.plot.2, 'RN by Box')
 
     #SN vs SN init
     SN.rel = atlantistools::convert_relative_initial(SN.age)
     temp.plot.3 = atlantistools::plot_line(SN.rel, col = 'agecl')
-    temp.plot.3 = ggplot2::update_labels(temp.plot.3,list(x = 'Time (years)', y= expression(SN/SN[init])))
+    temp.plot.3 = ggplot2::update_labels(
+      temp.plot.3,
+      list(x = 'Time (years)', y = expression(SN / SN[init]))
+    )
     temp.plot.3 = atlantistools::plot_add_box(temp.plot.3)
-    temp.plot.3 = add.title(temp.plot.3,'SN vs SN Init')
+    temp.plot.3 = add.title(temp.plot.3, 'SN vs SN Init')
 
     #RN vs RN init
     RN.rel = atlantistools::convert_relative_initial(RN.age)
     temp.plot.4 = atlantistools::plot_line(RN.rel, col = 'agecl')
-    temp.plot.4 = ggplot2::update_labels(temp.plot.4,list(x = 'Time (years)', y= expression(RN/RN[init])))
+    temp.plot.4 = ggplot2::update_labels(
+      temp.plot.4,
+      list(x = 'Time (years)', y = expression(RN / RN[init]))
+    )
     temp.plot.4 = atlantistools::plot_add_box(temp.plot.4)
-    temp.plot.4 = add.title(temp.plot.4,'RN vs RN Init')
+    temp.plot.4 = add.title(temp.plot.4, 'RN vs RN Init')
 
     #SN/RN domain-wide
     RN.SN = SN.box %>%
       dplyr::rename('SN' = atoutput) %>%
-      dplyr::left_join(RN.box,by = c("species", "polygon", "time")) %>%
+      dplyr::left_join(RN.box, by = c("species", "polygon", "time")) %>%
       dplyr::rename('RN' = atoutput) %>%
-      dplyr::group_by(species,time) %>%
-      dplyr::summarize(SN = sum(SN,na.rm=T),
-                       RN = sum(RN,na.rm=T)) %>%
-      dplyr::mutate(RN.SN = RN/SN)
+      dplyr::group_by(species, time) %>%
+      dplyr::summarize(SN = sum(SN, na.rm = T), RN = sum(RN, na.rm = T)) %>%
+      dplyr::mutate(RN.SN = RN / SN)
 
-    temp.plot.5 = ggplot2::ggplot(RN.SN, ggplot2::aes(x= time,y = RN.SN))+
-      ggplot2::geom_line()+
-      ggplot2::geom_hline(yintercept = 2.65,lty = 2)+
-      ggplot2::facet_wrap(~species)+
-      ggplot2::theme_classic()+
-      ggplot2::theme(plot.title =  ggplot2::element_text(size = 14),
-                     axis.title =  ggplot2::element_text(size = 14),
-                     axis.text =  ggplot2::element_text(size = 12),
-                     strip.text =  ggplot2::element_text(size = 14))
+    temp.plot.5 = ggplot2::ggplot(RN.SN, ggplot2::aes(x = time, y = RN.SN)) +
+      ggplot2::geom_line() +
+      ggplot2::geom_hline(yintercept = 2.65, lty = 2) +
+      ggplot2::facet_wrap(~species) +
+      ggplot2::theme_classic() +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(size = 14),
+        axis.title = ggplot2::element_text(size = 14),
+        axis.text = ggplot2::element_text(size = 12),
+        strip.text = ggplot2::element_text(size = 14)
+      )
     # ggsave(filename = paste0(atl.dir,'Figures/','test.pdf'),width = 30, height = 30, units = 'in')
 
-    pdf(file = file.path(fig.dir,paste0(run.name,' SN RN Timeseries.pdf')),width = 60, height = 60, onefile = T)
+    pdf(
+      file = file.path(fig.dir, paste0(run.name, ' SN RN Timeseries.pdf')),
+      width = 60,
+      height = 60,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
     gridExtra::grid.arrange(temp.plot.2)
     gridExtra::grid.arrange(temp.plot.3)
@@ -638,35 +854,54 @@ make_atlantis_diagnostic_figures = function(out.dir,
     gridExtra::grid.arrange(temp.plot.5)
     dev.off()
 
-    rm(RN.box,RN.age,SN.box,SN.age)
+    rm(RN.box, RN.age, SN.box, SN.age)
   }
-
 
   # Recruitment/SSB plots ---------------------------------------------------
 
-
   #Plot recruits
-  if(plot.recruits|plot.all){
+  if (plot.recruits | plot.all) {
     print("recruits")
     # Recruits TS
-    ssb.recruits = readRDS(file.path(out.dir,'ssb_recruits.rds'))
+    ssb.recruits = readRDS(file.path(out.dir, 'ssb_recruits.rds'))
 
     temp.plot.1 = atlantistools::plot_line(ssb.recruits, y = 'rec')
-    temp.plot.1 = ggplot2::update_labels(temp.plot.1,labels = list(x = 'Time (days)', y = 'Numbers'))
+    temp.plot.1 = ggplot2::update_labels(
+      temp.plot.1,
+      labels = list(x = 'Time (days)', y = 'Numbers')
+    )
     temp.plot.1 = add.title(temp.plot.1, 'Recruits')
 
     # SSB TS
     temp.plot.2 = atlantistools::plot_line(ssb.recruits, y = 'ssb')
-    temp.plot.2 = ggplot2::update_labels(temp.plot.2,labels = list(x = 'Time (days)', y = 'Numbers'))
+    temp.plot.2 = ggplot2::update_labels(
+      temp.plot.2,
+      labels = list(x = 'Time (days)', y = 'Numbers')
+    )
     temp.plot.2 = add.title(temp.plot.2, 'SSB')
 
     # Recruit per SSB
-    ssb.recruits$rec.per.sbb = ssb.recruits$rec/ssb.recruits$ssb
-    temp.plot.3 = atlantistools::plot_line(ssb.recruits, y= 'rec.per.sbb', yexpand = T)
-    temp.plot.3 = ggplot2::update_labels(temp.plot.3,labels = list(x = 'Time (days)',y = 'Numbers'))
+    ssb.recruits$rec.per.sbb = ssb.recruits$rec / ssb.recruits$ssb
+    temp.plot.3 = atlantistools::plot_line(
+      ssb.recruits,
+      y = 'rec.per.sbb',
+      yexpand = T
+    )
+    temp.plot.3 = ggplot2::update_labels(
+      temp.plot.3,
+      labels = list(x = 'Time (days)', y = 'Numbers')
+    )
     temp.plot.3 = add.title(temp.plot.3, 'Recruits per SSB')
 
-    pdf(file = file.path(fig.dir,paste0(run.name,' Recruitment SSB Timeseries.pdf')),width = 14, height = 14,onefile = T)
+    pdf(
+      file = file.path(
+        fig.dir,
+        paste0(run.name, ' Recruitment SSB Timeseries.pdf')
+      ),
+      width = 14,
+      height = 14,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
     gridExtra::grid.arrange(temp.plot.2)
     gridExtra::grid.arrange(temp.plot.3)
@@ -675,62 +910,90 @@ make_atlantis_diagnostic_figures = function(out.dir,
     rm(ssb.recruits)
   }
 
-
   # Numbers timeseries ------------------------------------------------------
 
-
   #Plot Numbers timeseries
-  if(plot.numbers.timeseries|plot.all){
+  if (plot.numbers.timeseries | plot.all) {
     print("numbers")
     #Numbers TS
-    numbers = readRDS(file.path(out.dir,'numbers.rds'))
+    numbers = readRDS(file.path(out.dir, 'numbers.rds'))
 
     temp.plot.1 = atlantistools::plot_line(numbers)
-    temp.plot.1 = ggplot2::update_labels(temp.plot.1,labels = list(x='Time (years)', y = 'Numbers'))
-    temp.plot.1 = add.title(temp.plot.1,'Numbers')
+    temp.plot.1 = ggplot2::update_labels(
+      temp.plot.1,
+      labels = list(x = 'Time (years)', y = 'Numbers')
+    )
+    temp.plot.1 = add.title(temp.plot.1, 'Numbers')
 
     #Numbers at age
-    numbers.age = readRDS(file.path(out.dir,'numbers_age.rds'))
+    numbers.age = readRDS(file.path(out.dir, 'numbers_age.rds'))
 
     temp.plot.2 = atlantistools::plot_line(numbers.age, col = 'agecl')
-    temp.plot.2 = ggplot2::update_labels(temp.plot.2, labels = list(x='Time (years)',y = 'Numbers', colour = 'Ageclass'))
+    temp.plot.2 = ggplot2::update_labels(
+      temp.plot.2,
+      labels = list(x = 'Time (years)', y = 'Numbers', colour = 'Ageclass')
+    )
     temp.plot.2 = add.title(temp.plot.2, 'Numbers at age')
 
     #Num age vs num init
     nums.rel = atlantistools::convert_relative_initial(numbers.age)
     temp.plot.3 = atlantistools::plot_line(nums.rel, col = 'agecl')
-    temp.plot.3 = ggplot2::update_labels(temp.plot.3, list(x='Time (years)', y= expression(Numbers/Numbers[init])))
+    temp.plot.3 = ggplot2::update_labels(
+      temp.plot.3,
+      list(x = 'Time (years)', y = expression(Numbers / Numbers[init]))
+    )
     temp.plot.3 = atlantistools::plot_add_box(temp.plot.3)
     temp.plot.3 = add.title(temp.plot.3, 'Numbers vs. Initial Numbers')
 
     #Numbers per ageclass, used to scale recruitment values from initial conditions ageclass 1
-    nums.rel = dplyr::group_by(nums.rel,species,agecl)
+    nums.rel = dplyr::group_by(nums.rel, species, agecl)
     nums.rel = dplyr::summarise(nums.rel, avg = mean(atoutput))
     nums.rel = tidyr::spread(nums.rel, agecl, avg)
 
-    nums.scale = 1/rowMeans(nums.rel[,2])
-    nums.c = data.frame(nums.rel[,1])
+    nums.scale = 1 / rowMeans(nums.rel[, 2])
+    nums.c = data.frame(nums.rel[, 1])
     nums.c$scale = nums.scale
 
     nums.init = dplyr::filter(numbers.age, time == 0 & agecl == 1)
 
-    RN.age = readRDS(file.path(out.dir,'RN_age.rds'))
-    SN.age = readRDS(file.path(out.dir,'SN_age.rds'))
+    RN.age = readRDS(file.path(out.dir, 'RN_age.rds'))
+    SN.age = readRDS(file.path(out.dir, 'SN_age.rds'))
 
     RN.age = dplyr::filter(RN.age, time == 0 & agecl == 1)
     SN.age = dplyr::filter(SN.age, time == 0 & agecl == 1)
 
-    nums.RN.SN = dplyr::left_join(nums.init, group.index, by = c('species' = 'LongName'))
+    nums.RN.SN = dplyr::left_join(
+      nums.init,
+      group.index,
+      by = c('species' = 'LongName')
+    )
     nums.RN.SN$SN_RN = RN.age$atoutput + SN.age$atoutput
-    nums.RN.SN$totalN = nums.RN.SN$atoutput*nums.RN.SN$SN_RN
+    nums.RN.SN$totalN = nums.RN.SN$atoutput * nums.RN.SN$SN_RN
     numscale.f = dplyr::left_join(nums.RN.SN, nums.c, by = 'species')
 
-    write.csv(numscale.f, file = file.path(fig.dir,paste0(run.name,'_init_nums_scalar_for_recruits.csv')),row.names = T)
+    write.csv(
+      numscale.f,
+      file = file.path(
+        fig.dir,
+        paste0(run.name, '_init_nums_scalar_for_recruits.csv')
+      ),
+      row.names = T
+    )
 
     #num at age %
-    num.pct = atlantistools::agg_perc(numbers.age, groups = c('time','species'))
-    temp.plot.4 = atlantistools::plot_bar(num.pct, fill = 'agecl', wrap = 'species')
-    temp.plot.4 = ggplot2::update_labels(temp.plot.4, labels = list(x= "Time (years0",y = 'Numbers (%)'))
+    num.pct = atlantistools::agg_perc(
+      numbers.age,
+      groups = c('time', 'species')
+    )
+    temp.plot.4 = atlantistools::plot_bar(
+      num.pct,
+      fill = 'agecl',
+      wrap = 'species'
+    )
+    temp.plot.4 = ggplot2::update_labels(
+      temp.plot.4,
+      labels = list(x = "Time (years0", y = 'Numbers (%)')
+    )
     temp.plot.4 = add.title(temp.plot.4, 'Numbers at age - Percent')
 
     #Biomass Pool Grazers
@@ -741,7 +1004,12 @@ make_atlantis_diagnostic_figures = function(out.dir,
     # temp.plot.5 = ggplot2::update_labels(temp.plot.5,list(x = 'Time (years)',y='Numbers'))
     # temp.plot.5 = add.title(temp.plot.5, 'Biomass Pool Grazers')
 
-    pdf(file=file.path(fig.dir,paste0(run.name,' Numbers Timeseries.pdf')), width = 24, height = 24, onefile = T)
+    pdf(
+      file = file.path(fig.dir, paste0(run.name, ' Numbers Timeseries.pdf')),
+      width = 24,
+      height = 24,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
     gridExtra::grid.arrange(temp.plot.2)
     gridExtra::grid.arrange(temp.plot.3)
@@ -749,85 +1017,127 @@ make_atlantis_diagnostic_figures = function(out.dir,
     # gridExtra::grid.arrange(temp.plot.5)
     dev.off()
 
-    rm(RN.age,SN.age,numbers,numbers.age)
+    rm(RN.age, SN.age, numbers, numbers.age)
   }
-
 
   # Physics plots -----------------------------------------------------------
 
-
   #plot physics variables
-  if(plot.physics|plot.all){
+  if (plot.physics | plot.all) {
     print("physics")
     #Physics snapshot
-    physics.statevars = readRDS(file.path(out.dir,'physics_statevars.rds'))
+    physics.statevars = readRDS(file.path(out.dir, 'physics_statevars.rds'))
 
     temp.plot.1 = atlantistools::plot_line(physics.statevars, wrap = NULL)
-    temp.plot.1 = atlantistools::custom_grid(temp.plot.1, grid_x = 'polygon', grid_y = 'variable')
+    temp.plot.1 = atlantistools::custom_grid(
+      temp.plot.1,
+      grid_x = 'polygon',
+      grid_y = 'variable'
+    )
     temp.plot.1 = ggplot2::update_labels(temp.plot.1, list(y = ''))
     temp.plot.1 = add.title(temp.plot.1, 'Physics Snapshot')
 
     #Phys plots
     physics = atlantistools::flip_layers(physics.statevars)
-    physics = split(physics,physics$variable)
+    physics = split(physics, physics$variable)
     phys.plots = list()
-    for(v in 1:length(physics)){
-      phys.plots[[v]] = atlantistools::plot_line(physics[[v]],wrap = NULL)
-      phys.plots[[v]] = atlantistools::custom_grid(phys.plots[[v]],grid_x = 'polygon', grid_y = 'layer')
-      phys.plots[[v]] = add.title(phys.plots[[v]],names(physics)[v])
-      phys.plots[[v]] = ggplot2::update_labels(phys.plots[[v]], labels = list(x = 'time', y= names(phys.plots)[v]))
+    for (v in 1:length(physics)) {
+      phys.plots[[v]] = atlantistools::plot_line(physics[[v]], wrap = NULL)
+      phys.plots[[v]] = atlantistools::custom_grid(
+        phys.plots[[v]],
+        grid_x = 'polygon',
+        grid_y = 'layer'
+      )
+      phys.plots[[v]] = add.title(phys.plots[[v]], names(physics)[v])
+      phys.plots[[v]] = ggplot2::update_labels(
+        phys.plots[[v]],
+        labels = list(x = 'time', y = names(phys.plots)[v])
+      )
     }
 
     #fluxes 1
-    flux = readRDS(file.path(out.dir,'flux.rds'))
+    flux = readRDS(file.path(out.dir, 'flux.rds'))
     temp.plot.2 = atlantistools::flip_layers(flux)
-    temp.plot.2 = atlantistools::plot_line(temp.plot.2,wrap = NULL, col = 'variable')
-    temp.plot.2 = atlantistools::custom_grid(temp.plot.2, grid_x = 'polygon', grid_y = 'layer')
+    temp.plot.2 = atlantistools::plot_line(
+      temp.plot.2,
+      wrap = NULL,
+      col = 'variable'
+    )
+    temp.plot.2 = atlantistools::custom_grid(
+      temp.plot.2,
+      grid_x = 'polygon',
+      grid_y = 'layer'
+    )
     temp.plot.2 = ggplot2::update_labels(temp.plot.2, list(y = ''))
     temp.plot.2 = add.title(temp.plot.2, 'Fluxes')
 
     #fluxes 2
-    source.sink = readRDS(file.path(out.dir,'source_sink.rds'))
+    source.sink = readRDS(file.path(out.dir, 'source_sink.rds'))
     temp.plot.3 = atlantistools::flip_layers(source.sink)
-    temp.plot.3 = atlantistools::plot_line(temp.plot.3,wrap = NULL, col = 'variable')
-    temp.plot.3 = atlantistools::custom_grid(temp.plot.3, grid_x = 'polygon', grid_y = 'layer')
+    temp.plot.3 = atlantistools::plot_line(
+      temp.plot.3,
+      wrap = NULL,
+      col = 'variable'
+    )
+    temp.plot.3 = atlantistools::custom_grid(
+      temp.plot.3,
+      grid_x = 'polygon',
+      grid_y = 'layer'
+    )
     temp.plot.3 = ggplot2::update_labels(temp.plot.3, list(y = ''))
     temp.plot.3 = add.title(temp.plot.3, 'Source-Sink')
 
     #Changes in wc w/ rel dz
-    dz = readRDS(file.path(out.dir,'dz.rds'))
-    nominal.dz = readRDS(file.path(out.dir,'nominal_dz.rds'))
+    dz = readRDS(file.path(out.dir, 'dz.rds'))
+    nominal.dz = readRDS(file.path(out.dir, 'nominal_dz.rds'))
 
-    check.dz = dplyr::left_join(dz,nominal.dz, by = c('polygon','layer'))
-    check.dz = dplyr::mutate(check.dz, check.dz = atoutput.x/atoutput.y)
+    check.dz = dplyr::left_join(dz, nominal.dz, by = c('polygon', 'layer'))
+    check.dz = dplyr::mutate(check.dz, check.dz = atoutput.x / atoutput.y)
     check.dz = dplyr::filter(check.dz, !is.na(check.dz))
 
-    temp.plot.4 = atlantistools::plot_line(check.dz,x = 'time',y = 'check.dz',wrap = 'polygon',col = 'layer')
-    temp.plot.4 = ggplot2::update_labels(temp.plot.4,list(x='Time (years)',y= expression(dz/nominal_dz)))
-    temp.plot.4 = add.title(temp.plot.4,'Change in Water Column Height')
+    temp.plot.4 = atlantistools::plot_line(
+      check.dz,
+      x = 'time',
+      y = 'check.dz',
+      wrap = 'polygon',
+      col = 'layer'
+    )
+    temp.plot.4 = ggplot2::update_labels(
+      temp.plot.4,
+      list(x = 'Time (years)', y = expression(dz / nominal_dz))
+    )
+    temp.plot.4 = add.title(temp.plot.4, 'Change in Water Column Height')
     temp.plot.4 = ggplot2::update_labels(temp.plot.4, list(y = ''))
 
     # Additional Temp plots (boxplot by layer and polygon)
     tempD <- physics.statevars |>
       dplyr::filter(variable == "Temp") |>
-      dplyr::group_by(polygon,time) |>
-      dplyr::mutate(layer = dplyr::n()-2-layer) |>
-      dplyr::mutate(layer = dplyr::case_when(layer < 0 ~ 4,
-                                             .default = layer)) |>
+      dplyr::group_by(polygon, time) |>
+      dplyr::mutate(layer = dplyr::n() - 2 - layer) |>
+      dplyr::mutate(
+        layer = dplyr::case_when(layer < 0 ~ 4, .default = layer)
+      ) |>
       dplyr::ungroup() |>
       dplyr::mutate(layer = as.factor(layer))
     tempD$layer <- factor(tempD$layer, levels = rev(levels(tempD$layer)))
     temp.plot.5 <- ggplot2::ggplot(data = tempD) +
-      ggplot2::geom_boxplot(ggplot2::aes(atoutput,layer,group=layer),outlier.size = 0.5) +
+      ggplot2::geom_boxplot(
+        ggplot2::aes(atoutput, layer, group = layer),
+        outlier.size = 0.5
+      ) +
       ggplot2::facet_wrap(~polygon) +
       ggplot2::xlab("Temperature (\u00b0C)") +
       ggplot2::ylab("Layer (0 = Surface, 4 = Sediment)") +
       ggplot2::ggtitle("Temperature distribution by polygon/layer")
 
-
-    pdf(file = file.path(fig.dir,paste0(run.name, ' Physics Timeseries.pdf')),width = 60, height = 18, onefile = T)
+    pdf(
+      file = file.path(fig.dir, paste0(run.name, ' Physics Timeseries.pdf')),
+      width = 60,
+      height = 18,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
-    for(i in 1:length(phys.plots)){
+    for (i in 1:length(phys.plots)) {
       gridExtra::grid.arrange(phys.plots[[i]])
     }
     gridExtra::grid.arrange(temp.plot.2)
@@ -836,67 +1146,98 @@ make_atlantis_diagnostic_figures = function(out.dir,
     gridExtra::grid.arrange(temp.plot.5)
     dev.off()
 
-    rm(physics.statevars,flux,source.sink,dz,nominal.dz)
+    rm(physics.statevars, flux, source.sink, dz, nominal.dz)
   }
-
 
   # Growth and Consumption --------------------------------------------------
 
-
   #plot growth and consumption
-  if(plot.growth.cons|plot.all){
+  if (plot.growth.cons | plot.all) {
     print("growth")
     #Growth at ageclass v growth init
-    growth.age = readRDS(file.path(out.dir,'growth_age.rds'))
+    growth.age = readRDS(file.path(out.dir, 'growth_age.rds'))
     growth.rel = atlantistools::convert_relative_initial(growth.age)
     temp.plot.1 = atlantistools::plot_line(growth.rel, col = 'agecl')
-    temp.plot.1 = ggplot2::update_labels(temp.plot.1, list(x= 'Time (years)', y = expression(Growth/Growth[init])))
+    temp.plot.1 = ggplot2::update_labels(
+      temp.plot.1,
+      list(x = 'Time (years)', y = expression(Growth / Growth[init]))
+    )
     temp.plot.1 = atlantistools::plot_add_box(temp.plot.1)
     temp.plot.1 = add.title(temp.plot.1, 'Growth at Age vs. Iniital Growth')
 
     #Grwoth vs growth init
-    growth.rel.init = readRDS(file.path(out.dir,'growth_rel_init.rds'))
-    temp.plot.2 = atlantistools::plot_line(growth.rel.init, y = 'gr_rel', col = 'agecl')
-    temp.plot.2 = ggplot2::update_labels(temp.plot.2, list(y = expression((Growth-Growth[req]/Growth[req]))))
-    temp.plot.2 = add.title(temp.plot.2,'Growth vs. Initial Growth')
+    growth.rel.init = readRDS(file.path(out.dir, 'growth_rel_init.rds'))
+    temp.plot.2 = atlantistools::plot_line(
+      growth.rel.init,
+      y = 'gr_rel',
+      col = 'agecl'
+    )
+    temp.plot.2 = ggplot2::update_labels(
+      temp.plot.2,
+      list(y = expression((Growth - Growth[req] / Growth[req])))
+    )
+    temp.plot.2 = add.title(temp.plot.2, 'Growth vs. Initial Growth')
 
     #Consumptions at age vs. initial
-    eat_age = readRDS(file.path(out.dir,'eat_age.rds'))
+    eat_age = readRDS(file.path(out.dir, 'eat_age.rds'))
     cons.rel = atlantistools::convert_relative_initial(eat_age)
-    temp.plot.3 = atlantistools::plot_line(cons.rel,col = 'agecl')
-    temp.plot.3 = ggplot2::update_labels(temp.plot.3, list(x = 'Time (years)', y= expression (Consumption/Consumption[init])))
+    temp.plot.3 = atlantistools::plot_line(cons.rel, col = 'agecl')
+    temp.plot.3 = ggplot2::update_labels(
+      temp.plot.3,
+      list(x = 'Time (years)', y = expression(Consumption / Consumption[init]))
+    )
     temp.plot.3 = atlantistools::plot_add_box(temp.plot.3)
-    temp.plot.3 = add.title(temp.plot.3, 'Consumption at Age vs. Initial Consumption')
+    temp.plot.3 = add.title(
+      temp.plot.3,
+      'Consumption at Age vs. Initial Consumption'
+    )
 
     #Consumption at age timeseries
     temp.plot.4 = atlantistools::plot_line(eat_age, col = 'agecl')
-    temp.plot.4 = ggplot2::update_labels(temp.plot.4, list(x='Time (years)',y='Biomass (tonnes)',color = 'Ageclass'))
+    temp.plot.4 = ggplot2::update_labels(
+      temp.plot.4,
+      list(x = 'Time (years)', y = 'Biomass (tonnes)', color = 'Ageclass')
+    )
     temp.plot.4 = add.title(temp.plot.4, 'Consumption at Age')
 
-    pdf(file = file.path(fig.dir,paste0(run.name,' Growth and Consumption.pdf')),width = 24, height = 24, onefile = T)
+    pdf(
+      file = file.path(
+        fig.dir,
+        paste0(run.name, ' Growth and Consumption.pdf')
+      ),
+      width = 24,
+      height = 24,
+      onefile = T
+    )
     gridExtra::grid.arrange(temp.plot.1)
     gridExtra::grid.arrange(temp.plot.2)
     gridExtra::grid.arrange(temp.plot.3)
     gridExtra::grid.arrange(temp.plot.4)
     dev.off()
 
-    rm(growth.age,growth.rel.init,eat_age)
+    rm(growth.age, growth.rel.init, eat_age)
   }
-
 
   # Cohort timeseries -------------------------------------------------------
 
-
   #plot cohort timeseries
-  if(plot.cohort|plot.all){
+  if (plot.cohort | plot.all) {
     print("cohort")
-    numbers.age = readRDS(file.path(out.dir,'numbers_age.rds'))
-    pdf(file = file.path(fig.dir, paste0(run.name, ' Cohort Timeseries.pdf')),width = 24, height = 18, onefile =T)
-    for(i in 1:10){
+    numbers.age = readRDS(file.path(out.dir, 'numbers_age.rds'))
+    pdf(
+      file = file.path(fig.dir, paste0(run.name, ' Cohort Timeseries.pdf')),
+      width = 24,
+      height = 18,
+      onefile = T
+    )
+    for (i in 1:10) {
       age.sub = dplyr::filter(numbers.age, agecl == i)
       temp.plot = atlantistools::plot_line(age.sub)
-      temp.plot = ggplot2::update_labels(temp.plot,list(x='Time (years)',y = 'Numbers'))
-      temp.plot = add.title(temp.plot,paste0('Age-',i))
+      temp.plot = ggplot2::update_labels(
+        temp.plot,
+        list(x = 'Time (years)', y = 'Numbers')
+      )
+      temp.plot = add.title(temp.plot, paste0('Age-', i))
       gridExtra::grid.arrange(temp.plot)
     }
     dev.off()
@@ -904,196 +1245,255 @@ make_atlantis_diagnostic_figures = function(out.dir,
     rm(numbers.age)
   }
 
-
   # Diet --------------------------------------------------------------------
 
-
   #Diet figures
-  if(plot.diet|plot.all){
+  if (plot.diet | plot.all) {
     print("diet")
-    bio_consumed = readRDS(file.path(out.dir,'biomass_consumed.rds'))
-    if(nrow(bio_consumed)>0){
-
+    bio_consumed = readRDS(file.path(out.dir, 'biomass_consumed.rds'))
+    if (nrow(bio_consumed) > 0) {
       # diet.plots = atlantistools::plot_diet(result$biomass.consumed, wrap_col =  'agecl', combine_thresh =  3)
       wrap_col = 'agecl'
       combine_thresh = 3
       species = NULL
       print("1")
-      atlantistools::check_df_names(data = bio_consumed, expect = c("pred", "agecl",
-                                                                    "time", "prey", "atoutput"), optional = "polygon")
+      atlantistools::check_df_names(
+        data = bio_consumed,
+        expect = c("pred", "agecl", "time", "prey", "atoutput"),
+        optional = "polygon"
+      )
       print("2")
 
-      agg_bio <- atlantistools::agg_data(bio_consumed,
-                                         groups = c("time", "pred","agecl", "prey"),
-                                         fun = sum)
+      agg_bio <- atlantistools::agg_data(
+        bio_consumed,
+        groups = c("time", "pred", "agecl", "prey"),
+        fun = sum
+      )
       print("3")
-      preddata <- atlantistools::agg_perc(agg_bio,
-                                          groups = c("time", "pred","agecl"))
+      preddata <- atlantistools::agg_perc(
+        agg_bio,
+        groups = c("time", "pred", "agecl")
+      )
       print("4")
-      preydata <- atlantistools::agg_perc(agg_bio,
-                                          groups = c("time", "prey", "agecl"))
+      preydata <- atlantistools::agg_perc(
+        agg_bio,
+        groups = c("time", "prey", "agecl")
+      )
       print("5")
-      pred_comb <- atlantistools::combine_groups(preddata,
-                                                 group_col = "prey",
-                                                 groups = c("time", "pred", "agecl"),
-                                                 combine_thresh = combine_thresh)
+      pred_comb <- atlantistools::combine_groups(
+        preddata,
+        group_col = "prey",
+        groups = c("time", "pred", "agecl"),
+        combine_thresh = combine_thresh
+      )
       print("6")
-      prey_comb <- atlantistools::combine_groups(preydata,
-                                                 group_col = "pred",
-                                                 groups = c("time", "prey", "agecl"),
-                                                 combine_thresh = combine_thresh)
+      prey_comb <- atlantistools::combine_groups(
+        preydata,
+        group_col = "pred",
+        groups = c("time", "prey", "agecl"),
+        combine_thresh = combine_thresh
+      )
       print("7")
 
       if (is.null(species)) {
-        species <- sort(union(union(union(preddata$pred, preddata$prey),
-                                    preydata$pred), preydata$prey))
+        species <- sort(union(
+          union(union(preddata$pred, preddata$prey), preydata$pred),
+          preydata$prey
+        ))
       }
       grobs <- vector("list", length = length(species))
       for (i in seq_along(grobs)) {
         grobs[[i]] <- vector("list", length = 2)
       }
       for (i in seq_along(species)) {
-        df_pred <- dplyr::filter_(pred_comb, ~pred == species[i])
-        df_prey <- dplyr::filter_(prey_comb, ~prey == species[i])
+        df_pred <- dplyr::filter_(pred_comb, ~ pred == species[i])
+        df_prey <- dplyr::filter_(prey_comb, ~ prey == species[i])
         grobs[[i]][[1]] <- plot_sp(df_pred, col = "prey", wrap_col = wrap_col)
         grobs[[i]][[2]] <- plot_sp(df_prey, col = "pred", wrap_col = wrap_col)
       }
       for (i in seq_along(grobs)) {
-        heading <- grid::textGrob(paste("Diet proportions for species:",
-                                        species[i]), gp = grid::gpar(fontsize = 14))
-        grobs[[i]][[1]] <- grobs[[i]][[1]] + ggplot2::labs(y = "Predator perspective")
-        grobs[[i]][[2]] <- grobs[[i]][[2]] + ggplot2::labs(y = "Prey perspective")
-        grobs[[i]] <- gridExtra::arrangeGrob(grobs = c(list(heading),
-                                                       grobs[[i]]), heights = grid::unit(c(0.05, 0.475,
-                                                                                           0.475), units = "npc"))
+        heading <- grid::textGrob(
+          paste("Diet proportions for species:", species[i]),
+          gp = grid::gpar(fontsize = 14)
+        )
+        grobs[[i]][[1]] <- grobs[[i]][[1]] +
+          ggplot2::labs(y = "Predator perspective")
+        grobs[[i]][[2]] <- grobs[[i]][[2]] +
+          ggplot2::labs(y = "Prey perspective")
+        grobs[[i]] <- gridExtra::arrangeGrob(
+          grobs = c(list(heading), grobs[[i]]),
+          heights = grid::unit(c(0.05, 0.475, 0.475), units = "npc")
+        )
       }
       names(grobs) <- species
 
-      pdf(file = file.path(fig.dir,paste0(run.name, ' Diet Proportions.pdf')),paper = 'A4r',width = 22, height = 16, onefile = T)
-      for(i in seq_along(grobs)){
+      pdf(
+        file = file.path(fig.dir, paste0(run.name, ' Diet Proportions.pdf')),
+        paper = 'A4r',
+        width = 22,
+        height = 16,
+        onefile = T
+      )
+      for (i in seq_along(grobs)) {
         gridExtra::grid.arrange(grobs[[i]])
       }
       dev.off()
     }
 
     rm(bio_consumed)
-
   }
 
-  if(plot.consumption|plot.all){
+  if (plot.consumption | plot.all) {
     print("consumption")
-    if(file.size(param.ls$prod.nc)> 1E9){
+    if (file.size(param.ls$prod.nc) > 1E9) {
       print('Output file size too large to generate consumption plots')
-    }else{
+    } else {
       #source(here::here('R','plot_overall_predation.R'))
-      consumption = get_consumption(prod.file = param.ls$prod.nc,
-                                    fgs.file = param.ls$groups.file)
-      data.sub = subset_diet(diet.file = param.ls$dietcheck,
-                             consumption = consumption,
-                             spp.names  = group.index$Code)
-      plot_overall_predation(data = data.sub,
-                             bioindex.file = file.path(atl.dir,'neus_outputBiomIndx.txt'),
-                             catch.file = file.path(atl.dir,'neus_outputCatch.txt'),
-                             min.fract = 0.1,
-                             fig.dir = fig.dir,
-                             file.prefix = run.name)
+      consumption = get_consumption(
+        prod.file = param.ls$prod.nc,
+        fgs.file = param.ls$groups.file
+      )
+      data.sub = subset_diet(
+        diet.file = param.ls$dietcheck,
+        consumption = consumption,
+        spp.names = group.index$Code
+      )
+      plot_overall_predation(
+        data = data.sub,
+        bioindex.file = file.path(atl.dir, 'neus_outputBiomIndx.txt'),
+        catch.file = file.path(atl.dir, 'neus_outputCatch.txt'),
+        min.fract = 0.1,
+        fig.dir = fig.dir,
+        file.prefix = run.name
+      )
     }
   }
 
   # Spatial biomass ---------------------------------------------------------
 
-
   #Spatial biomass
-  if(plot.spatial.biomass){
+  if (plot.spatial.biomass) {
     print("spatial biomass")
-    biomass.spatial.stanza <-  readRDS(file.path(out.dir,'biomass_spatial_stanza.rds'))
-    volume = readRDS(file.path(out.dir,'volume.rds'))
+    biomass.spatial.stanza <- readRDS(file.path(
+      out.dir,
+      'biomass_spatial_stanza.rds'
+    ))
+    volume = readRDS(file.path(out.dir, 'volume.rds'))
 
-    temp.plots = atlantistools::plot_spatial_box(bio_spatial = biomass.spatial.stanza,
-                                                 bgm_as_df = atlantistools::convert_bgm(bgm = param.ls$bgm),
-                                                 timesteps = 7)
-    pdf(file = file.path(fig.dir, paste0(run.name, ' Spatial Biomass Box Distribution.pdf')),width = 24, height =18 )
-    for( i in seq_along(temp.plots)){
+    temp.plots = atlantistools::plot_spatial_box(
+      bio_spatial = biomass.spatial.stanza,
+      bgm_as_df = atlantistools::convert_bgm(bgm = param.ls$bgm),
+      timesteps = 7
+    )
+    pdf(
+      file = file.path(
+        fig.dir,
+        paste0(run.name, ' Spatial Biomass Box Distribution.pdf')
+      ),
+      width = 24,
+      height = 18
+    )
+    for (i in seq_along(temp.plots)) {
       gridExtra::grid.arrange(temp.plots[[i]])
     }
     dev.off()
 
     print("next")
-    biomass.spatial.stanza <-  dplyr::filter(biomass.spatial.stanza,!is.na(layer))
-    temp.plots.2 = atlantistools::plot_spatial_ts(bio_spatial = biomass.spatial.stanza,
-                                                  bgm_as_df = atlantistools::convert_bgm(bgm = param.ls$bgm),
-                                                  vol = volume )
-    pdf(file = file.path(fig.dir, paste0(run.name, ' Spatial Biomass Distribution Timeseries.pdf')),width =24, height =18 )
-    for(i in seq_along(temp.plots.2)){
+    biomass.spatial.stanza <- dplyr::filter(
+      biomass.spatial.stanza,
+      !is.na(layer)
+    )
+    temp.plots.2 = atlantistools::plot_spatial_ts(
+      bio_spatial = biomass.spatial.stanza,
+      bgm_as_df = atlantistools::convert_bgm(bgm = param.ls$bgm),
+      vol = volume
+    )
+    pdf(
+      file = file.path(
+        fig.dir,
+        paste0(run.name, ' Spatial Biomass Distribution Timeseries.pdf')
+      ),
+      width = 24,
+      height = 18
+    )
+    for (i in seq_along(temp.plots.2)) {
       gridExtra::grid.arrange(temp.plots.2[[i]])
     }
     dev.off()
 
     rm(biomass.spatial.stanza)
-
   }
-
 
   # This needs to be reworked
-  if(F & plot.spatial.biomass.seasonal){
+  if (F & plot.spatial.biomass.seasonal) {
     #source(here::here('R','plot_biomass_box_summary.R'))
     print("spatial biomass seasonal")
-    plot_biomass_box_season(bio.box = readRDS(file.path(out.dir,'biomass_box.rds')),
-                            bio.box.invert = readRDS(file.path(out.dir,'biomass_box_invert.rds')),
-                            fig.dir = fig.dir,
-                            species.list = NULL,
-                            plot.presence = T,
-                            save.fig = T)
+    plot_biomass_box_season(
+      bio.box = readRDS(file.path(out.dir, 'biomass_box.rds')),
+      bio.box.invert = readRDS(file.path(out.dir, 'biomass_box_invert.rds')),
+      fig.dir = fig.dir,
+      species.list = NULL,
+      plot.presence = T,
+      save.fig = T
+    )
   }
 
-  if(plot.spatial.catch|plot.all){
+  if (plot.spatial.catch | plot.all) {
     print("spatial catch")
     bgm = atlantistools::convert_bgm(bgm = param.ls$bgm)
 
-    biomass.box = readRDS(file.path(out.dir,'biomass_box.rds'))%>%
-      dplyr::filter(time >= (max(time)-10))%>%
-      dplyr::group_by(species,polygon)%>%
-      dplyr::summarise(biomass = mean(atoutput,na.rm=T))
+    biomass.box = readRDS(file.path(out.dir, 'biomass_box.rds')) %>%
+      dplyr::filter(time >= (max(time) - 10)) %>%
+      dplyr::group_by(species, polygon) %>%
+      dplyr::summarise(biomass = mean(atoutput, na.rm = T))
 
-    catch = readRDS(file.path(out.dir,'catch.rds')) %>%
-      dplyr::filter(time >= (max(time)-10))%>%
-      dplyr::group_by(species,polygon)%>%
-      dplyr::summarise(catch = mean(atoutput,na.rm=T))
+    catch = readRDS(file.path(out.dir, 'catch.rds')) %>%
+      dplyr::filter(time >= (max(time) - 10)) %>%
+      dplyr::group_by(species, polygon) %>%
+      dplyr::summarise(catch = mean(atoutput, na.rm = T))
 
     biomass.catch.box = biomass.box %>%
       dplyr::left_join(catch)
 
-    i=1
-    pdf(paste0(fig.dir,'/spatial_biomass_catch.pdf'))
-    for(i in 1:nrow(group.index)){
-
-      biomass.catch.spp =biomass.catch.box %>%
+    i = 1
+    pdf(paste0(fig.dir, '/spatial_biomass_catch.pdf'))
+    for (i in 1:nrow(group.index)) {
+      biomass.catch.spp = biomass.catch.box %>%
         dplyr::filter(species == group.index$LongName[i])
 
       biomass.catch.spp.polygon = bgm %>%
         dplyr::left_join(biomass.catch.spp)
 
-      p1 = ggplot2::ggplot(biomass.catch.spp.polygon, ggplot2::aes(x = long, y = lat, fill = biomass, group = polygon))+
-        ggplot2::geom_polygon(color = 'black',lwd = 0.3)+
-        ggplot2::coord_equal()+
-        ggplot2::scale_fill_viridis_c()+
-        ggplot2::ggtitle('Biomass')+
-        ggplot2::theme_bw()+
-        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5),
-                       legend.position = 'bottom',
-                       legend.key.width = ggplot2::unit(0.4,'in'))
-      p2 = ggplot2::ggplot(biomass.catch.spp.polygon, ggplot2::aes(x = long, y = lat, fill = catch, group = polygon))+
-        ggplot2::geom_polygon(color = 'black',lwd = 0.3)+
-        ggplot2::coord_equal()+
-        ggplot2::scale_fill_viridis_c()+
-        ggplot2::ggtitle('Catch')+
-        ggplot2::theme_bw()+
-        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5),
-                       legend.position = 'bottom',
-                       legend.key.width = ggplot2::unit(0.4,'in'))
+      p1 = ggplot2::ggplot(
+        biomass.catch.spp.polygon,
+        ggplot2::aes(x = long, y = lat, fill = biomass, group = polygon)
+      ) +
+        ggplot2::geom_polygon(color = 'black', lwd = 0.3) +
+        ggplot2::coord_equal() +
+        ggplot2::scale_fill_viridis_c() +
+        ggplot2::ggtitle('Biomass') +
+        ggplot2::theme_bw() +
+        ggplot2::theme(
+          plot.title = ggplot2::element_text(hjust = 0.5),
+          legend.position = 'bottom',
+          legend.key.width = ggplot2::unit(0.4, 'in')
+        )
+      p2 = ggplot2::ggplot(
+        biomass.catch.spp.polygon,
+        ggplot2::aes(x = long, y = lat, fill = catch, group = polygon)
+      ) +
+        ggplot2::geom_polygon(color = 'black', lwd = 0.3) +
+        ggplot2::coord_equal() +
+        ggplot2::scale_fill_viridis_c() +
+        ggplot2::ggtitle('Catch') +
+        ggplot2::theme_bw() +
+        ggplot2::theme(
+          plot.title = ggplot2::element_text(hjust = 0.5),
+          legend.position = 'bottom',
+          legend.key.width = ggplot2::unit(0.4, 'in')
+        )
 
-      gridExtra::grid.arrange(p1,p2, nrow = 1, top = group.index$LongName[i])
-
+      gridExtra::grid.arrange(p1, p2, nrow = 1, top = group.index$LongName[i])
     }
     dev.off()
   }

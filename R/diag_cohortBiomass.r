@@ -25,46 +25,65 @@
 #'
 #' @export
 
-diag_cohortBiomass <- function(fgs,
-                               mortality,
-                               agebiomind,
-                               speciesCodes = NULL,
-                               neusPriority,
-                               fishedSpecies = 2) {
-
-
+diag_cohortBiomass <- function(
+  fgs,
+  mortality,
+  agebiomind,
+  speciesCodes = NULL,
+  neusPriority,
+  fishedSpecies = 2
+) {
   # get species codes
   allCodes <- atlantistools::get_turnedon_acronyms(fgs)
-  if(!is.null(speciesCodes)) { # user supplied codes
+  if (!is.null(speciesCodes)) {
+    # user supplied codes
     # check to see if codes are valid model codes
-    invalidCodes <- base::setdiff(speciesCodes,allCodes)
-    if (!(length(invalidCodes)==0)){
-      stop("Invalid Atlantis group codes: ",paste0(invalidCodes,collapse=", "))
+    invalidCodes <- base::setdiff(speciesCodes, allCodes)
+    if (!(length(invalidCodes) == 0)) {
+      stop(
+        "Invalid Atlantis group codes: ",
+        paste0(invalidCodes, collapse = ", ")
+      )
     }
-  } else { # use all codes
+  } else {
+    # use all codes
     speciesCodes <- allCodes
   }
 
   #pull all species with >= 2 groups that are FISH
   ageCodes <- atlantistools::get_age_acronyms(fgs)
 
-  cohortBiom <- utils::read.csv(agebiomind,sep = " ", stringsAsFactors=FALSE, header=TRUE)
-  mort <- utils::read.csv(mortality,sep = " ", stringsAsFactors=FALSE, header=TRUE)
-  mort <- dplyr::select(mort,dplyr::contains(".F"))
-  mort_l20 <- dplyr::slice(mort,-c(1:34,55))
+  cohortBiom <- utils::read.csv(
+    agebiomind,
+    sep = " ",
+    stringsAsFactors = FALSE,
+    header = TRUE
+  )
+  mort <- utils::read.csv(
+    mortality,
+    sep = " ",
+    stringsAsFactors = FALSE,
+    header = TRUE
+  )
+  mort <- dplyr::select(mort, dplyr::contains(".F"))
+  mort_l20 <- dplyr::slice(mort, -c(1:34, 55))
   meanMort <- colMeans(mort_l20) %>% t() %>% as.data.frame()
 
-  neusPriority <- utils::read.csv(neusPriority,sep=",",stringsAsFactors=FALSE,header=TRUE) %>%
+  neusPriority <- utils::read.csv(
+    neusPriority,
+    sep = ",",
+    stringsAsFactors = FALSE,
+    header = TRUE
+  ) %>%
     dplyr::rename(priority = .data$priority.overall) %>%
-    dplyr::select(.data$code,.data$priority)
+    dplyr::select(.data$code, .data$priority)
 
   numRows <- nrow(cohortBiom)
   lastRow <- numRows - 1
   firstRow <- numRows - 100
-  cohortBiom <- dplyr::slice(cohortBiom,firstRow:lastRow)
+  cohortBiom <- dplyr::slice(cohortBiom, firstRow:lastRow)
 
   numGroups <- length(speciesCodes)
-
 
   maxCohort <- c()
   pass <- c()
@@ -72,22 +91,22 @@ diag_cohortBiomass <- function(fgs,
 
   for (i in 1:numGroups) {
     groupName <- speciesCodes[i]
-    groupCohort <- dplyr::select(cohortBiom,contains(groupName))
+    groupCohort <- dplyr::select(cohortBiom, contains(groupName))
     groupCohortMean <- colMeans(groupCohort)
 
     maxCohortMean <- base::which.max(groupCohortMean)
     maxCohort <- c(maxCohort, maxCohortMean)
     if (maxCohortMean == 1 || maxCohortMean == 10) {
-      pass <- c(pass,F)
+      pass <- c(pass, F)
     } else {
       pass <- c(pass, T)
     }
     maxMeanIndex <- base::which.max(groupCohortMean)
     maxMeanIndex <- maxMeanIndex[[1]]
-    stabVal <- groupCohort[100,maxMeanIndex] / groupCohort[5,maxMeanIndex]
+    stabVal <- groupCohort[100, maxMeanIndex] / groupCohort[5, maxMeanIndex]
 
     if (stabVal < 0.75) {
-      stability <- c(stability,"Declining")
+      stability <- c(stability, "Declining")
     } else if (stabVal > 1.25) {
       stability <- c(stability, "Increasing")
     } else {
@@ -95,20 +114,19 @@ diag_cohortBiomass <- function(fgs,
     }
   }
 
-
-  diagnostics <- data.frame(code=speciesCodes,pass,maxCohort,stability)
-  diagnostics <- dplyr::inner_join(diagnostics,neusPriority,by="code")
+  diagnostics <- data.frame(code = speciesCodes, pass, maxCohort, stability)
+  diagnostics <- dplyr::inner_join(diagnostics, neusPriority, by = "code")
   diagnostics$fishing <- NULL
 
   numGroups <- nrow(diagnostics)
   for (i in 1:numGroups) {
-    groupCol <- dplyr::select(meanMort,contains(diagnostics$code[i]))
+    groupCol <- dplyr::select(meanMort, contains(diagnostics$code[i]))
     #print(groupCol[1,1])
-    if (groupCol[1,1] >= 0.05) {
+    if (groupCol[1, 1] >= 0.05) {
       diagnostics$fishing[i] <- 1
-    } else if (groupCol[1,1] > 0.001) {
+    } else if (groupCol[1, 1] > 0.001) {
       diagnostics$fishing[i] <- 2
-    } else if (groupCol[1,1] > 0.0001) {
+    } else if (groupCol[1, 1] > 0.0001) {
       diagnostics$fishing[i] <- 3
     } else {
       diagnostics$fishing[i] <- 4
@@ -118,7 +136,14 @@ diag_cohortBiomass <- function(fgs,
   diagnostics <- diagnostics %>%
     dplyr::filter(.data$code %in% ageCodes) %>%
     dplyr::filter(.data$fishing <= fishedSpecies) %>%
-    dplyr::arrange(.data$pass,.data$priority,.data$fishing,.data$maxCohort,.data$stability,.data$code) %>%
+    dplyr::arrange(
+      .data$pass,
+      .data$priority,
+      .data$fishing,
+      .data$maxCohort,
+      .data$stability,
+      .data$code
+    ) %>%
     tibble::as_tibble()
 
   return(diagnostics)

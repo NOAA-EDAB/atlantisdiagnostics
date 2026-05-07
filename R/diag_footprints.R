@@ -34,8 +34,7 @@
 #'
 #'@export
 
-diag_footprints <- function(paramList, speciesCodes=NULL) {
-
+diag_footprints <- function(paramList, speciesCodes = NULL) {
   # check to see if all parameter files are available
 
   check_param_files(paramList$run.prm)
@@ -43,12 +42,11 @@ diag_footprints <- function(paramList, speciesCodes=NULL) {
   check_param_files(paramList$biol.prm)
   check_param_files(paramList$groups.file)
 
-
   # get list of groups in the model
   allCodes <- atlantistools::get_acronyms(paramList$groups.file)
-   if(is.null(speciesCodes)) {
+  if (is.null(speciesCodes)) {
     speciesCodes <- allCodes
-   } else {
+  } else {
     # check to see if speciesCodes is in the temperatureLimits
     if (!speciesCodes %in% allCodes) {
       stop(paste0("Species Code", speciesCodes, " not found"))
@@ -61,64 +59,59 @@ diag_footprints <- function(paramList, speciesCodes=NULL) {
 
   # grab the horizontal redistrbution proportions for recruitment in non boundary boxes
   hdistRecruit <- get_param_recruit_hdistrib(paramList$biol.prm) |>
-    dplyr::filter(!(polygon %in% bboxes),
-                  value > 1e-5)
+    dplyr::filter(!(polygon %in% bboxes), value > 1e-5)
   # grab the vertical redistrbution proportions for recruitment in non boundary boxes
   vdistRecruit <- get_param_recruit_vdistrib(paramList$biol.prm) |>
     dplyr::filter(value > 1e-5)
 
   #get the horizontal redistribution proportions for non recruits in non boundary boxes
-  hdistAge <- get_param_FXXX_SY(paramList$biol.prm)|>
-    dplyr::filter(!(polygon %in% bboxes),
-                  value > 1e-5)
+  hdistAge <- get_param_FXXX_SY(paramList$biol.prm) |>
+    dplyr::filter(!(polygon %in% bboxes), value > 1e-5)
 
   #get the vertical redistribution proportions for non recruits in non boundary boxes
-  vdistAge <- get_param_vert(paramList$biol.prm)|>
+  vdistAge <- get_param_vert(paramList$biol.prm) |>
     dplyr::filter(value > 1e-5)
-
 
   tab <- NULL
   # For each species compare spatial distribtuions
   for (species in speciesCodes) {
-
     # horizontal distribution of age groups
     if (species %in% unique(hdistAge$group)) {
       # for vertebrates adult same as juvenile
       spatialExtentOfSpeciesAgeAdult <- hdistAge |>
-            dplyr::filter(group == species,
-                          cohort == "adult") |>
-            dplyr::select(polygon) |>
-            dplyr::distinct() |>
-            dplyr::pull()
+        dplyr::filter(group == species, cohort == "adult") |>
+        dplyr::select(polygon) |>
+        dplyr::distinct() |>
+        dplyr::pull()
       spatialExtentOfSpeciesAgeJuv <- hdistAge |>
-            dplyr::filter(group == species,
-                          cohort == "juv") |>
-            dplyr::select(polygon) |>
-            dplyr::distinct() |>
-            dplyr::pull()
+        dplyr::filter(group == species, cohort == "juv") |>
+        dplyr::select(polygon) |>
+        dplyr::distinct() |>
+        dplyr::pull()
       spatialExtentOfSpeciesRecruit <- hdistRecruit |>
-            dplyr::filter(group == species) |>
-            dplyr::select(polygon) |>
-            dplyr::distinct() |>
-            dplyr::pull()
+        dplyr::filter(group == species) |>
+        dplyr::select(polygon) |>
+        dplyr::distinct() |>
+        dplyr::pull()
 
-        recruitJuv <- identical(spatialExtentOfSpeciesRecruit,spatialExtentOfSpeciesAgeJuv)
-        adultJuv <- identical(spatialExtentOfSpeciesAgeAdult,spatialExtentOfSpeciesAgeJuv)
+      recruitJuv <- identical(
+        spatialExtentOfSpeciesRecruit,
+        spatialExtentOfSpeciesAgeJuv
+      )
+      adultJuv <- identical(
+        spatialExtentOfSpeciesAgeAdult,
+        spatialExtentOfSpeciesAgeJuv
+      )
     } else {
       adultJuv <- NA
       recruitJuv <- NA
     }
 
-
     speciesContrib <-
-      data.frame(group = species,
-                 adultJuv = adultJuv,
-                 recruitJuv = recruitJuv)
+      data.frame(group = species, adultJuv = adultJuv, recruitJuv = recruitJuv)
 
-    tab <- dplyr::bind_rows(tab,speciesContrib)
-
+    tab <- dplyr::bind_rows(tab, speciesContrib)
   }
 
   return(tab)
-
 }
