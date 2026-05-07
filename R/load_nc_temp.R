@@ -2,7 +2,7 @@
 #'
 #'@noRd
 
-load_nc_temp = function(
+load_nc_temp <- function(
   nc,
   fgs,
   bps,
@@ -129,7 +129,8 @@ load_nc_temp = function(
   }
   at_data <- list()
   if (report) {
-    pb <- dplyr::progress_estimated(length(search_clean))
+    message("working on loading stuff in nc file")
+    #    pb <- dplyr::progress_estimated(length(search_clean))
   }
   for (i in seq_along(search_clean)) {
     at_data[[i]] <- RNetCDF::var.get.nc(
@@ -367,13 +368,8 @@ load_nc_temp = function(
     result <- result[!min_pools, ]
   }
   if (select_variable == "N" & any(final_agecl == 2)) {
-    # old
-    # result <- result %>%
-    #   dplyr::group_by_("species", "polygon","layer", "time") %>%
-    #   dplyr::summarise_(atoutput = ~sum(atoutput)) %>%
-    #   dplyr::ungroup()
     result <- result %>%
-      dplyr::group_by_("species", "polygon", "layer", "time") %>%
+      dplyr::group_by(species, polygon, layer, time) %>%
       dplyr::summarise(atoutput = sum(atoutput), .groups = "drop")
   }
   if (nrow(result) == 0) {

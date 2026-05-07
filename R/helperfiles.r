@@ -47,14 +47,8 @@ plot_sp <- function(data, col, wrap_col) {
       data[[col]],
       levels = agg_data[[1]][order(agg_data$sum_diet, decreasing = TRUE)]
     )
-    plot <- ggplot2::ggplot(
-      data,
-      ggplot2::aes_(
-        x = ~time,
-        y = ~atoutput,
-        fill = lazyeval::interp(~var, var = as.name(col))
-      )
-    ) +
+    plot <- ggplot2::ggplot(data) +
+      ggplot2::aes(x = time, y = atoutput, fill = .data[[col]]) +
       ggplot2::geom_bar(stat = "identity") +
       ggplot2::scale_fill_manual(
         values = c(

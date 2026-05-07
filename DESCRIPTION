@@ -20,8 +20,7 @@ Authors@R:
            role = c("aut"),
            email = "Robert.Gamble@noaa.gov"),
     person(given = "Ryan",family = "Morse", role = c("aut"),
-           email = "ryan.morse@noaa.gov",
-           comment = c(ORCID = "YOUR-ORCID-ID")))
+           email = "ryan.morse@noaa.gov"))
 Description: Atlantis diagnostics functions in this package are used to determine whether the model 
     is meeting defined performance and review criteria. Processing functions are used to format the model output for 
     plotting and diagnostic tests

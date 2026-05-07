@@ -1306,8 +1306,8 @@ make_atlantis_diagnostic_figures = function(
         grobs[[i]] <- vector("list", length = 2)
       }
       for (i in seq_along(species)) {
-        df_pred <- dplyr::filter_(pred_comb, ~ pred == species[i])
-        df_prey <- dplyr::filter_(prey_comb, ~ prey == species[i])
+        df_pred <- dplyr::filter(pred_comb, pred == species[i])
+        df_prey <- dplyr::filter(prey_comb, prey == species[i])
         grobs[[i]][[1]] <- plot_sp(df_pred, col = "prey", wrap_col = wrap_col)
         grobs[[i]][[2]] <- plot_sp(df_prey, col = "pred", wrap_col = wrap_col)
       }

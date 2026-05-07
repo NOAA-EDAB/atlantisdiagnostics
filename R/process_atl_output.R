@@ -427,7 +427,7 @@ process_atl_output = function(
     sp.overlap = list()
     biomass.box.invert = list()
     length.age = list()
-
+    message("Reading in 'Nums', 'StructN', 'ResN', 'N'")
     if (large.file == F) {
       vars = list('Nums', 'StructN', 'ResN', 'N')
       group.types = list(groups.age, groups.age, groups.age, groups.bp)
@@ -979,6 +979,7 @@ process_atl_output = function(
     growth.rel.init = list()
     bio.consumed = list()
 
+    message("Reading in 'Eat', 'Grazing', 'Growth'")
     if (large.file == F) {
       vars = list('Eat', 'Grazing', 'Growth')
       group.types = list(groups.age, groups.bp, groups.age)
@@ -1014,28 +1015,20 @@ process_atl_output = function(
         consumed_bio = data_eat %>%
           dplyr::filter(species == pred.names[i]) %>%
           dplyr::left_join(boxvol, by = c('polygon', 'time')) %>%
-          dplyr::mutate_(
-            .dots = stats::setNames(list(~ atoutput * vol), "atoutput")
-          ) %>%
-          dplyr::mutate_(
-            .dots = stats::setNames(list(~ atoutput * bio.conv), "atoutput")
-          ) %>%
+          dplyr::mutate(atoutput = atoutput * vol) %>%
+          dplyr::mutate(atoutput = atoutput * bio.conv) %>%
           dplyr::full_join(
             dplyr::filter(data.dietcheck, pred == pred.names[i]),
             by = c(species = "pred", "time", "agecl")
           ) %>%
-          dplyr::filter_(~ time %in% ts_eat) %>%
-          dplyr::rename_(.dots = c(pred = "species"))
+          dplyr::filter(time %in% ts_eat) %>%
+          dplyr::rename(pred = species)
         bio.consumed[[i]] = consumed_bio %>%
-          dplyr::filter_(~ !is.na(atoutput.x)) %>%
-          dplyr::filter_(~ !is.na(atoutput.y)) %>%
-          dplyr::mutate_(
-            .dots = stats::setNames(list(~ atoutput.x * atoutput.y), "atoutput")
-          ) %>%
-          dplyr::select_(
-            .dots = names(.)[
-              !names(.) %in% c("atoutput.x", "vol", "atoutput.y")
-            ]
+          dplyr::filter(!is.na(atoutput.x)) %>%
+          dplyr::filter(!is.na(atoutput.y)) %>%
+          dplyr::mutate(atoutput = atoutput.x * atoutput.y) %>%
+          dplyr::select(
+            !dplyr::any_of(c("atoutput.x", "vol", "atoutput.y"))
           ) %>%
           dplyr::ungroup()
 
@@ -1203,7 +1196,7 @@ process_atl_output = function(
   }
 
   # Do catch -------------------------------------------------------------------
-
+  message("Reading Catch")
   if (plot.catch | plot.spatial.catch | process.all | plot.all) {
     catch = atlantistools::load_nc(
       param.ls$catch,
