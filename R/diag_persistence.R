@@ -52,39 +52,52 @@
 #'
 #'}
 
-diag_persistence <- function(fgs,
-                             biomind,
-                             speciesCodes=NULL,
-                             nYrs = NULL,
-                             floor = 0.1,
-                             display=NULL,
-                             tol = 1E-6){
-
-
+diag_persistence <- function(
+  fgs,
+  biomind,
+  speciesCodes = NULL,
+  nYrs = NULL,
+  floor = 0.1,
+  display = NULL,
+  tol = 1E-6
+) {
   # read in biomass data and qualify species Codes
-  biom <- get_model_biomass(fgs,biomind,speciesCodes)
+  biom <- get_model_biomass(fgs, biomind, speciesCodes)
   modelBiomass <- biom$modelBiomass
   speciesCodes <- biom$speciesCodes
 
   # find final time step value
   maxRuntime <- max(modelBiomass$time)
 
-  if (is.null(nYrs)) { # use all time series
+  if (is.null(nYrs)) {
+    # use all time series
     filterTime <- 0
-  } else { # last n years
-    filterTime <- maxRuntime - (365*nYrs)
+  } else {
+    # last n years
+    filterTime <- maxRuntime - (365 * nYrs)
   }
 
   # For each species calculate which time steps biomass is below persistence threshold
   # we look at biomass < % initial Biomass
   status <- modelBiomass %>%
     dplyr::filter(.data$code %in% speciesCodes) %>%
-    dplyr::select(.data$code,.data$species, .data$time, .data$atoutput) %>%
+    dplyr::select(.data$code, .data$species, .data$time, .data$atoutput) %>%
     dplyr::group_by(.data$code) %>%
     dplyr::mutate(initialBiomass = dplyr::first(.data$atoutput)) %>%
     dplyr::filter(.data$time >= filterTime) %>%
-    dplyr::mutate(proportionInitBio = dplyr::if_else(is.nan(.data$atoutput/.data$initialBiomass),0,.data$atoutput/.data$initialBiomass)) %>%
-    dplyr::mutate(proportionInitBio = as.numeric(trimws(format(round(.data$proportionInitBio,3),nsmall=3)))) %>%
+    dplyr::mutate(
+      proportionInitBio = dplyr::if_else(
+        is.nan(.data$atoutput / .data$initialBiomass),
+        0,
+        .data$atoutput / .data$initialBiomass
+      )
+    ) %>%
+    dplyr::mutate(
+      proportionInitBio = as.numeric(trimws(format(
+        round(.data$proportionInitBio, 3),
+        nsmall = 3
+      )))
+    ) %>%
     #    dplyr::filter(proportionInitBio <= (floor + tol)) %>%
     dplyr::mutate(pass = .data$proportionInitBio >= (floor + tol)) %>%
     dplyr::ungroup()
@@ -97,12 +110,25 @@ diag_persistence <- function(fgs,
     dplyr::group_by(.data$code) %>%
     dplyr::mutate(minimumBiomass = min(.data$atoutput)) %>%
     dplyr::mutate(nts = dplyr::n()) %>%
-    dplyr::mutate(tminimumBiomass = dplyr::case_when(.data$atoutput == min(.data$atoutput) ~ .data$time)) %>%
+    dplyr::mutate(
+      tminimumBiomass = dplyr::case_when(
+        .data$atoutput == min(.data$atoutput) ~ .data$time
+      )
+    ) %>%
     dplyr::mutate(t1 = min(.data$time), tn = max(.data$time)) %>%
     dplyr::filter(!is.na(.data$tminimumBiomass)) %>%
-    dplyr::select(.data$code,.data$species,.data$initialBiomass,
-                  .data$proportionInitBio, .data$minimumBiomass,
-                  .data$tminimumBiomass, .data$t1, .data$tn, .data$nts,.data$pass) %>%
+    dplyr::select(
+      .data$code,
+      .data$species,
+      .data$initialBiomass,
+      .data$proportionInitBio,
+      .data$minimumBiomass,
+      .data$tminimumBiomass,
+      .data$t1,
+      .data$tn,
+      .data$nts,
+      .data$pass
+    ) %>%
     dplyr::filter(.data$tminimumBiomass == min(.data$tminimumBiomass)) %>%
     dplyr::ungroup()
 
@@ -114,32 +140,42 @@ diag_persistence <- function(fgs,
     dplyr::group_by(.data$code) %>%
     dplyr::mutate(minimumBiomass = min(.data$atoutput)) %>%
     dplyr::mutate(nts = 0) %>%
-    dplyr::mutate(tminimumBiomass = dplyr::case_when(.data$atoutput == min(.data$atoutput) ~ .data$time)) %>%
+    dplyr::mutate(
+      tminimumBiomass = dplyr::case_when(
+        .data$atoutput == min(.data$atoutput) ~ .data$time
+      )
+    ) %>%
     dplyr::mutate(t1 = NA, tn = NA) %>%
     dplyr::filter(!is.na(.data$tminimumBiomass)) %>%
-    dplyr::select(.data$code,.data$species,.data$initialBiomass,.data$proportionInitBio,
-                  .data$minimumBiomass, .data$tminimumBiomass, .data$t1, .data$tn, .data$nts,.data$pass) %>%
+    dplyr::select(
+      .data$code,
+      .data$species,
+      .data$initialBiomass,
+      .data$proportionInitBio,
+      .data$minimumBiomass,
+      .data$tminimumBiomass,
+      .data$t1,
+      .data$tn,
+      .data$nts,
+      .data$pass
+    ) %>%
     dplyr::filter(.data$tminimumBiomass == min(.data$tminimumBiomass)) %>%
     dplyr::ungroup()
 
-  persistence <- rbind(persistenceT,persistenceF)
-
+  persistence <- rbind(persistenceT, persistenceF)
 
   if (is.null(display)) {
     # return all
   } else if (display) {
     # return species that pass
-    persistence <- persistence %>% dplyr::filter(.data$pass==T)
-
+    persistence <- persistence %>% dplyr::filter(.data$pass == T)
   } else {
     # return all that fail
-    persistence <- persistence %>% dplyr::filter(.data$pass!=T)
-
+    persistence <- persistence %>% dplyr::filter(.data$pass != T)
   }
 
   persistence <- persistence %>%
-    dplyr::arrange(.data$pass,.data$proportionInitBio)
+    dplyr::arrange(.data$pass, .data$proportionInitBio)
 
   return(persistence)
-
 }

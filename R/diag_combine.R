@@ -18,19 +18,31 @@
 #'
 #'@export
 
-diag_combine <- function(persistence, stability, reasonability){
-
+diag_combine <- function(persistence, stability, reasonability) {
   diagnostics <- persistence %>%
-    dplyr::left_join(.data,stability,by = c("code","species")) %>%
+    dplyr::left_join(.data, stability, by = c("code", "species")) %>%
     dplyr::rename(persistence = .data$pass.x, stability = .data$pass.y) %>%
-    dplyr::select(.data$code, .data$species, .data$persistence, .data$stability, .data$proportionInitBio, .data$relChange) %>%
-    dplyr::left_join(.data, reasonability,by=c("code","species")) %>%
+    dplyr::select(
+      .data$code,
+      .data$species,
+      .data$persistence,
+      .data$stability,
+      .data$proportionInitBio,
+      .data$relChange
+    ) %>%
+    dplyr::left_join(.data, reasonability, by = c("code", "species")) %>%
     dplyr::rename(reasonability = .data$pass) %>%
-    dplyr::select(.data$code, .data$species, .data$persistence,  .data$proportionInitBio, .data$stability, .data$relChange,.data$reasonability, .data$maxExceedance) %>%
+    dplyr::select(
+      .data$code,
+      .data$species,
+      .data$persistence,
+      .data$proportionInitBio,
+      .data$stability,
+      .data$relChange,
+      .data$reasonability,
+      .data$maxExceedance
+    ) %>%
     dplyr::arrange(.data$persistence, .data$reasonability, .data$stability)
 
   return(diagnostics)
-
 }
-
-
