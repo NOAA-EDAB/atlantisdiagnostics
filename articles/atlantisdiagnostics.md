@@ -1,0 +1,6 @@
+# atlantisdiagnostics
+
+``` r
+
+library(atlantisdiagnostics)
+```
