@@ -6,9 +6,9 @@
 
 get_rawdata <- function(group, group.type) {
   if (group.type == 'age') {
-    main.vars = age.vars
+    main.vars <- age.vars
   } else {
-    main.vars = bp.vars
+    main.vars <- bp.vars
   }
 
   if (
@@ -17,7 +17,7 @@ get_rawdata <- function(group, group.type) {
     )] ==
       0
   ) {
-    rawdata.spp.f = list(data.frame(
+    rawdata.spp.f <- list(data.frame(
       species = group.types$species[i],
       polygon = NA,
       agecl = NA,
@@ -26,7 +26,7 @@ get_rawdata <- function(group, group.type) {
       atoutput = NA
     ))
   } else {
-    rawdata.spp.f = Map(
+    rawdata.spp.f <- Map(
       load_nc_temp,
       select_variable = main.vars,
       select_groups = group,
@@ -41,7 +41,7 @@ get_rawdata <- function(group, group.type) {
   }
 
   if (group.types$group[i] == 'bp') {
-    rawdata.spp.f[[1]]$agecl = 1
+    rawdata.spp.f[[1]]$agecl <- 1
   }
   return(rawdata.spp.f)
 }

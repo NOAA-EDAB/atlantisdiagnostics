@@ -21,7 +21,7 @@ get_param_FXXX_SY <- function(bio.prm) {
   values <- gsub("\t", " ", values)
 
   # create a null dataframe
-  out.df = data.frame(
+  out.df <- data.frame(
     group = NULL,
     season = NULL,
     cohort = NULL,

@@ -98,7 +98,7 @@ get_forcing_temperature <- function(param.ls, plotFigs = F) {
     # round up to nearest decade for plotting
     maxTime <- max(tempD$time) + (10 - max(tempD$time) %% 10)
     for (ilayer in sort(unique(tempD$layer))) {
-      data = tempD |>
+      data <- tempD |>
         dplyr::filter(layer == ilayer) |>
         dplyr::select(-variable, -layer)
       if (nrow(data) == 0) {

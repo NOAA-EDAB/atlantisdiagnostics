@@ -6,7 +6,7 @@
 
 # Box Gradient ------------------------------------------------------------
 # This needs to be reworked
-plot_biomass_box_season = function(
+plot_biomass_box_season <- function(
   bio.box,
   bio.box.invert,
   plot.presence = F,
@@ -15,15 +15,15 @@ plot_biomass_box_season = function(
   fig.dir,
   tolerance = 0.1
 ) {
-  box2epu = read.csv(here::here('Geometry', 'box2epu.csv'))
-  month2season = read.csv(here::here('data-raw', 'month2season.csv'))
-  season2name = data.frame(
+  box2epu <- read.csv(here::here('Geometry', 'box2epu.csv'))
+  month2season <- read.csv(here::here('data-raw', 'month2season.csv'))
+  season2name <- data.frame(
     season = 1:4,
     season.name = unique(month2season$season.name)
   )
-  fgs = read.csv(here::here('currentVersion', 'neus_groups.csv'))
+  fgs <- read.csv(here::here('currentVersion', 'neus_groups.csv'))
 
-  move.param = read.csv(here::here('data-raw', 'seasonal_movements.csv')) %>%
+  move.param <- read.csv(here::here('data-raw', 'seasonal_movements.csv')) %>%
     group_by(group, box, season) %>%
     summarise(orig = mean(value, na.rm = T)) %>%
     left_join(season2name) %>%
@@ -35,10 +35,10 @@ plot_biomass_box_season = function(
     mutate(orig.presence = ifelse(orig == 0, 0, 1)) %>%
     filter(!is.na(epu))
 
-  bio.all = rbind(bio.box, bio.box.invert) %>%
+  bio.all <- rbind(bio.box, bio.box.invert) %>%
     mutate(day = time * 365)
 
-  bio.all = bio.all %>%
+  bio.all <- bio.all %>%
     mutate(
       date = as.POSIXct(
         day * 86400,
@@ -52,25 +52,25 @@ plot_biomass_box_season = function(
     summarise(atoutput = mean(atoutput, na.rm = T))
 
   if (!is.null(species.list)) {
-    bio.all = bio.all %>%
+    bio.all <- bio.all %>%
       filter(species %in% species.list)
   }
 
-  bio.all = bio.all %>%
+  bio.all <- bio.all %>%
     group_by(species, polygon, season.name) %>%
     summarise(atoutput = mean(atoutput, na.rm = T))
 
-  bio.max = bio.all %>%
+  bio.max <- bio.all %>%
     group_by(species, season.name) %>%
     summarise(atoutput.max = sum(atoutput, na.rm = T))
 
-  box.combs = expand.grid(
+  box.combs <- expand.grid(
     species = unique(bio.all$species),
     polygon = sort(unique(bio.all$polygon)),
     season.name = unique(month2season$season.name)
   )
 
-  bio.presence = box.combs %>%
+  bio.presence <- box.combs %>%
     left_join(bio.all) %>%
     left_join(box2epu, by = c('polygon' = 'box')) %>%
     mutate(presence = ifelse(atoutput == 0 | is.na(atoutput), 0, 1)) %>%
@@ -91,15 +91,15 @@ plot_biomass_box_season = function(
       )
     )
 
-  bio.presence$polygon = factor(
+  bio.presence$polygon <- factor(
     bio.presence$polygon,
     levels = c(1:7, 9, 8, 12:15, 10:11, 16:22)
   )
 
   if (plot.presence) {
     # plot.ls = list()
-    plot.name = paste0(fig.dir, 'Box_EPU_season_presence.png')
-    p = ggplot(
+    plot.name <- paste0(fig.dir, 'Box_EPU_season_presence.png')
+    p <- ggplot(
       bio.presence,
       aes(x = polygon, y = season.name, alpha = presence.match, fill = epu)
     ) +
@@ -115,8 +115,8 @@ plot_biomass_box_season = function(
         plot.title = element_text(hjust = 0.5)
       )
   } else {
-    plot.name = paste0(fig.dir, 'Box_EPU_Season_scaled.png')
-    p = ggplot(
+    plot.name <- paste0(fig.dir, 'Box_EPU_Season_scaled.png')
+    p <- ggplot(
       bio.presence,
       aes(x = polygon, y = season.name, alpha = atoutput.scaled, fill = epu)
     ) +
@@ -156,7 +156,7 @@ plot_biomass_box_season = function(
 #' @noRd
 # Box Time Range ------------------------------------------------------------
 
-plot_biomass_box_range = function(
+plot_biomass_box_range <- function(
   bio.box,
   bio.box.invert,
   day.min = NA,
@@ -166,33 +166,33 @@ plot_biomass_box_range = function(
   save.fig = T,
   fig.dir
 ) {
-  box2epu = read.csv(here::here('Geometry', 'box2epu.csv'))
+  box2epu <- read.csv(here::here('Geometry', 'box2epu.csv'))
 
-  bio.all = rbind(bio.box, bio.box.invert) %>%
+  bio.all <- rbind(bio.box, bio.box.invert) %>%
     mutate(day = time * 365)
 
-  bio.all = bio.all %>%
+  bio.all <- bio.all %>%
     filter(day >= day.min & day <= day.max)
 
   if (!is.null(species.list)) {
-    bio.all = bio.all %>%
+    bio.all <- bio.all %>%
       filter(species %in% species.list)
   }
 
-  bio.all = bio.all %>%
+  bio.all <- bio.all %>%
     group_by(species, polygon) %>%
     summarise(atoutput = mean(atoutput, na.rm = T))
 
-  bio.max = bio.all %>%
+  bio.max <- bio.all %>%
     group_by(species) %>%
     summarise(atoutput.max = max(atoutput, na.rm = T))
 
-  box.combs = expand.grid(
+  box.combs <- expand.grid(
     species = unique(bio.all$species),
     polygon = sort(unique(bio.all$polygon))
   )
 
-  bio.presence = box.combs %>%
+  bio.presence <- box.combs %>%
     left_join(bio.all) %>%
     left_join(box2epu, by = c('polygon' = 'box')) %>%
     mutate(presence = ifelse(atoutput == 0 | is.na(atoutput), 0, 1)) %>%
@@ -202,23 +202,23 @@ plot_biomass_box_range = function(
       atoutput.scaled = ifelse(is.na(atoutput.scaled), 0, atoutput.scaled)
     )
 
-  bio.presence$polygon = factor(
+  bio.presence$polygon <- factor(
     bio.presence$polygon,
     levels = c(1:7, 9, 8, 12:15, 10:11, 16:22)
   )
 
-  spp.order = bio.presence %>%
+  spp.order <- bio.presence %>%
     group_by(species) %>%
     summarise(presence.freq = mean(atoutput.scaled)) %>%
     arrange(desc(presence.freq))
 
-  bio.presence$species = factor(
+  bio.presence$species <- factor(
     bio.presence$species,
     levels = rev(spp.order$species)
   )
 
   if (plot.presence) {
-    p = ggplot(
+    p <- ggplot(
       bio.presence,
       aes(x = polygon, y = species, alpha = presence, fill = epu)
     ) +
@@ -233,9 +233,9 @@ plot_biomass_box_range = function(
       theme_minimal() +
       theme(panel.grid = element_blank(), legend.position = 'bottom')
 
-    plot.name = paste0(fig.dir, 'Box_EPU_summary.png')
+    plot.name <- paste0(fig.dir, 'Box_EPU_summary.png')
   } else {
-    p = ggplot(
+    p <- ggplot(
       bio.presence,
       aes(x = polygon, y = species, alpha = atoutput.scaled, fill = epu)
     ) +
@@ -250,7 +250,7 @@ plot_biomass_box_range = function(
       theme_minimal() +
       theme(panel.grid = element_blank(), legend.position = 'bottom')
 
-    plot.name = paste0(fig.dir, 'Box_EPU_summary.png')
+    plot.name <- paste0(fig.dir, 'Box_EPU_summary.png')
   }
 
   if (save.fig) {

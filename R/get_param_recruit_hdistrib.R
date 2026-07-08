@@ -21,7 +21,7 @@ get_param_recruit_hdistrib <- function(bio.prm) {
   values <- gsub("\t", " ", values)
 
   # create a null dataframe
-  out.df = data.frame(group = NULL, polygon = NULL, value = NULL)
+  out.df <- data.frame(group = NULL, polygon = NULL, value = NULL)
   # loop through the lines and extract the values, groups and the min/max
   for (i in 1:length(lines)) {
     # remove trailing part of the line where the number of values on next line is listed
