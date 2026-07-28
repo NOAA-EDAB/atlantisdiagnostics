@@ -7,7 +7,7 @@
 #' @noRd
 
 agg_custom <- function(data, groups, fun, agg.scale) {
-  out = atlantistools::agg_data(data = data, groups = groups, fun = fun) %>%
+  out <- atlantistools::agg_data(data = data, groups = groups, fun = fun) %>%
     mutate(
       date = as.POSIXct(
         time * 365 * 86400,
@@ -17,15 +17,15 @@ agg_custom <- function(data, groups, fun, agg.scale) {
     )
 
   if (agg.scale == 'month') {
-    out$time.agg = as.numeric(factor(format(out$date, format = '%m')))
+    out$time.agg <- as.numeric(factor(format(out$date, format = '%m')))
   } else if (agg.scale == 'year') {
-    out$time.agg = as.numeric(factor(format(out$date, format = '%Y')))
+    out$time.agg <- as.numeric(factor(format(out$date, format = '%Y')))
   } else {
-    out$time.agg = out$time * 365
+    out$time.agg <- out$time * 365
   }
 
-  match.cols = c(groups[-which(groups == 'time')], 'time.agg')
-  out.agg = out %>%
+  match.cols <- c(groups[-which(groups == 'time')], 'time.agg')
+  out.agg <- out %>%
     group_by_at(match.cols) %>%
     dplyr::summarise(
       time = floor(min(time)),
