@@ -23,7 +23,7 @@
 #'
 #' @export
 
-compare_spatial_vars = function(
+compare_spatial_vars <- function(
   param.dir,
   run.dirs,
   run.names,
@@ -41,10 +41,10 @@ compare_spatial_vars = function(
   #Pull in reference data
 
   # ref.data = read.csv(ref.file, as.ist =T)%>%
-  ref.data = ref.data %>%
+  ref.data <- ref.data %>%
     dplyr::mutate(polygon = as.factor(polygon))
 
-  init.data = init.data %>%
+  init.data <- init.data %>%
     dplyr::mutate(polygon = as.factor(polygon))
 
   ##Check if ref.data$statistic == data.type
@@ -58,23 +58,23 @@ compare_spatial_vars = function(
 
   #Pull in spatial data
 
-  boxes = atlantistools::convert_bgm(param.ls$bgm.file) %>%
+  boxes <- atlantistools::convert_bgm(param.ls$bgm.file) %>%
     dplyr::mutate(polygon = as.factor(polygon))
 
   # ggplot2::ggplot(boxes,ggplot2::aes(x = long, y = lat, fill = polygon,group = polygon))+
   #   ggplot2::geom_polygon()
 
-  run.data.all.ls = list()
+  run.data.all.ls <- list()
   #Loop through each run.dirs
   for (i in 1:length(run.dirs)) {
     #Pull in run data
 
     if (tolower(ref.data$var.name[1]) == 'biomass') {
-      run.data = readRDS(paste0(
+      run.data <- readRDS(paste0(
         run.dirs[i],
         '/Post_Processed/Data/biomass_box.rds'
       ))
-      run.data.yr = run.data %>%
+      run.data.yr <- run.data %>%
         dplyr::mutate(polygon = as.factor(polygon)) %>%
         ##Calculate proportion by box over ref.years
         dplyr::filter(time >= ref.years[1] & time <= ref.years[2]) %>%
@@ -85,11 +85,11 @@ compare_spatial_vars = function(
         dplyr::mutate(model.total = sum(atoutput)) %>%
         dplyr::ungroup()
     } else if (tolower(ref.data$var.name[1]) == 'numbers') {
-      run.data = readRDS(paste0(
+      run.data <- readRDS(paste0(
         run.dirs[i],
         '/Post_Processed/Data/numbers_box.rds'
       ))
-      run.data.yr = run.data %>%
+      run.data.yr <- run.data %>%
         dplyr::mutate(polygon = as.factor(polygon)) %>%
         ##Calculate proportion by box over ref.years
         dplyr::filter(time >= ref.years[1] & time <= ref.years[2]) %>%
@@ -100,8 +100,8 @@ compare_spatial_vars = function(
         dplyr::mutate(model.total = sum(atoutput)) %>%
         dplyr::ungroup()
     } else if (tolower(ref.data$var.name[1]) == 'catch.total') {
-      run.data = readRDS(paste0(run.dirs[i], '/Post_Processed/Data/catch.rds'))
-      run.data.yr = run.data %>%
+      run.data <- readRDS(paste0(run.dirs[i], '/Post_Processed/Data/catch.rds'))
+      run.data.yr <- run.data %>%
         dplyr::mutate(polygon = as.factor(polygon)) %>%
         ##Calculate proportion by box over ref.years
         dplyr::filter(time >= ref.years[1] & time <= ref.years[2]) %>%
@@ -114,11 +114,11 @@ compare_spatial_vars = function(
         dplyr::mutate(model.total = sum(atoutput)) %>%
         dplyr::ungroup()
     } else if (tolower(ref.data$var.name[1]) == 'catch_fleet') {
-      run.data = readRDS(paste0(
+      run.data <- readRDS(paste0(
         run.dirs[i],
         '/Post_Processed/Data/catch_fleet.rds'
       ))
-      run.data.yr = run.data %>%
+      run.data.yr <- run.data %>%
         dplyr::mutate(polygon = as.factor(polygon)) %>%
         ##Calculate proportion by box over ref.years
         dplyr::filter(time >= ref.years[1] & time <= ref.years[2]) %>%
@@ -130,14 +130,14 @@ compare_spatial_vars = function(
         dplyr::ungroup()
     }
 
-    run.data.yr$polygon = as.factor(run.data.yr$polygon)
+    run.data.yr$polygon <- as.factor(run.data.yr$polygon)
 
     #Calculate proportion or value for model.val
     if (data.type == 'value') {
-      run.data.yr = run.data.yr %>%
+      run.data.yr <- run.data.yr %>%
         dplyr::mutate(model.val = atoutput)
     } else if (data.type == 'proportion') {
-      run.data.yr = run.data.yr %>%
+      run.data.yr <- run.data.yr %>%
         dplyr::mutate(model.val = atoutput / model.total)
     } else {
       warning("data.type must be either 'absolute' or 'proportion'")
@@ -145,10 +145,10 @@ compare_spatial_vars = function(
 
     #Join with ref.data
     if (tolower(ref.data$var.name[1]) %in% c('catch', 'catch_fleet')) {
-      init.data2 = init.data %>%
+      init.data2 <- init.data %>%
         dplyr::select(species, polygon, init.value) %>%
         dplyr::mutate(polygon = as.factor(polygon))
-      run.data.yr = run.data.yr %>%
+      run.data.yr <- run.data.yr %>%
         dplyr::left_join(ref.data) %>%
         dplyr::left_join(init.data2) %>%
         dplyr::mutate(
@@ -156,7 +156,7 @@ compare_spatial_vars = function(
           statistic = ref.data$statistic[1]
         )
     } else {
-      run.data.yr = run.data.yr %>%
+      run.data.yr <- run.data.yr %>%
         dplyr::left_join(ref.data) %>%
         dplyr::left_join(init.data)
     }
@@ -165,22 +165,22 @@ compare_spatial_vars = function(
 
     #Do difference
     if (comparison.type == 'difference') {
-      run.data.compare = run.data.yr %>%
+      run.data.compare <- run.data.yr %>%
         dplyr::mutate(compare.val = model.val - ref.value)
       #Do scalars
     } else if (comparison.type == 'scalar') {
-      run.data.compare = run.data.yr %>%
+      run.data.compare <- run.data.yr %>%
         dplyr::mutate(compare.val = (model.val - ref.value) / ref.value)
     } else {
       warning('comparison.type must be either "difference" or "scalar"')
     }
 
-    run.data.all.ls[[i]] = run.data.compare %>%
+    run.data.all.ls[[i]] <- run.data.compare %>%
       dplyr::mutate(run.name = run.names[i])
   }
 
   #Join to final dataframe with (species|polygon|atoutput|model.val|var.name|statistic|ref.value|compare.val|run.name|data.type|comparison.type)
-  run.data.all = dplyr::bind_rows(run.data.all.ls) %>%
+  run.data.all <- dplyr::bind_rows(run.data.all.ls) %>%
     dplyr::mutate(data.type = data.type, comparison.type = comparison.type)
 
   # out.name = paste(run.names,collapse = '_')
@@ -189,10 +189,10 @@ compare_spatial_vars = function(
   if (plot == T) {
     #If plotting create PDF with the following plots
 
-    fgs = read.csv(param.ls$groups.file)
-    spp.names = sort(unique(run.data.all$species))
-    spp.codes = fgs$Code[match(spp.names, fgs$LongName)]
-    box.id = sort(unique(boxes$polygon))
+    fgs <- read.csv(param.ls$groups.file)
+    spp.names <- sort(unique(run.data.all$species))
+    spp.codes <- fgs$Code[match(spp.names, fgs$LongName)]
+    box.id <- sort(unique(boxes$polygon))
 
     # filter species of interest
     if (!is.null(speciesCodes)) {
@@ -214,19 +214,19 @@ compare_spatial_vars = function(
         #Get species data
 
         #species ref box
-        ref.data.box = boxes %>%
+        ref.data.box <- boxes %>%
           dplyr::left_join(dplyr::filter(ref.data, species == spp.names[s]))
 
-        init.data.box = boxes %>%
+        init.data.box <- boxes %>%
           dplyr::left_join(dplyr::filter(init.data, species == spp.names[s]))
 
-        plot.data.ls = list()
+        plot.data.ls <- list()
         for (r in 1:length(run.names)) {
-          plot.data.spp = run.data.all %>%
+          plot.data.spp <- run.data.all %>%
             dplyr::filter(species == spp.names[s] & run.name == run.names[r])
 
           #get missing boxes
-          missing.df = data.frame(
+          missing.df <- data.frame(
             species = spp.names[s],
             polygon = box.id[which(!(box.id %in% plot.data.spp$polygon))],
             atoutput = NA,
@@ -242,17 +242,17 @@ compare_spatial_vars = function(
             dplyr::left_join(ref.data) %>%
             dplyr::left_join(init.data)
 
-          plot.data.spp = dplyr::bind_rows(plot.data.spp, missing.df) %>%
+          plot.data.spp <- dplyr::bind_rows(plot.data.spp, missing.df) %>%
             dplyr::mutate(polygon = as.factor(polygon))
 
-          plot.data.ls[[r]] = boxes %>%
+          plot.data.ls[[r]] <- boxes %>%
             dplyr::left_join(plot.data.spp, by = 'polygon')
         }
-        plot.data = dplyr::bind_rows(plot.data.ls)
+        plot.data <- dplyr::bind_rows(plot.data.ls)
 
-        plot.spp.ls = list()
+        plot.spp.ls <- list()
         #1: Maps of ref values
-        p1 = ggplot2::ggplot(
+        p1 <- ggplot2::ggplot(
           ref.data.box,
           ggplot2::aes(x = long, y = lat, group = polygon, fill = ref.value)
         ) +
@@ -269,7 +269,7 @@ compare_spatial_vars = function(
           )
 
         #2: Map of init values
-        p2 = ggplot2::ggplot(
+        p2 <- ggplot2::ggplot(
           init.data.box,
           ggplot2::aes(x = long, y = lat, group = polygon, fill = init.value)
         ) +
@@ -287,7 +287,7 @@ compare_spatial_vars = function(
 
         #3: Maps of run values
 
-        p3 = ggplot2::ggplot(
+        p3 <- ggplot2::ggplot(
           plot.data,
           ggplot2::aes(x = long, y = lat, group = polygon, fill = model.val)
         ) +
@@ -305,7 +305,7 @@ compare_spatial_vars = function(
           )
 
         #4: Maps of comparisons between runs and ref values
-        p4 = ggplot2::ggplot(
+        p4 <- ggplot2::ggplot(
           plot.data,
           ggplot2::aes(x = long, y = lat, group = polygon, fill = compare.val)
         ) +
@@ -323,7 +323,7 @@ compare_spatial_vars = function(
             plot.title = ggplot2::element_text(hjust = 0.5)
           )
 
-        plot.layout = matrix(
+        plot.layout <- matrix(
           c(
             1,
             1,
@@ -357,9 +357,9 @@ compare_spatial_vars = function(
 
       #If Catch Fleet
     } else {
-      fisheries = read.csv(param.ls$fishery.prm)
+      fisheries <- read.csv(param.ls$fishery.prm)
 
-      fleet.combs = run.data.all %>%
+      fleet.combs <- run.data.all %>%
         dplyr::distinct(species, fleet)
 
       if (!is.null(speciesCodes)) {
@@ -379,21 +379,21 @@ compare_spatial_vars = function(
         #Get species data
 
         #species ref box
-        ref.data.box = boxes %>%
+        ref.data.box <- boxes %>%
           dplyr::left_join(dplyr::filter(
             ref.data,
             species == fleet.combs$species[sf] & fleet == fleet.combs$fleet[sf]
           ))
 
-        init.data.box = boxes %>%
+        init.data.box <- boxes %>%
           dplyr::left_join(dplyr::filter(
             init.data,
             species == fleet.combs$species[sf]
           ))
 
-        plot.data.ls = list()
+        plot.data.ls <- list()
         for (r in 1:length(run.names)) {
-          plot.data.spp = run.data.all %>%
+          plot.data.spp <- run.data.all %>%
             dplyr::filter(
               species == fleet.combs$species[sf] &
                 fleet == fleet.combs$fleet[sf] &
@@ -401,9 +401,9 @@ compare_spatial_vars = function(
             )
 
           #get missing boxes
-          missing.box = box.id[which(!(box.id %in% plot.data.spp$polygon))]
+          missing.box <- box.id[which(!(box.id %in% plot.data.spp$polygon))]
           if (length(missing.box) > 0) {
-            missing.df = data.frame(
+            missing.df <- data.frame(
               species = fleet.combs$species[sf],
               fleet = fleet.combs$fleet[sf],
               polygon = box.id[which(!(box.id %in% plot.data.spp$polygon))],
@@ -420,21 +420,21 @@ compare_spatial_vars = function(
               dplyr::left_join(ref.data) %>%
               dplyr::left_join(init.data)
 
-            plot.data.spp = dplyr::bind_rows(plot.data.spp, missing.df) %>%
+            plot.data.spp <- dplyr::bind_rows(plot.data.spp, missing.df) %>%
               dplyr::mutate(polygon = as.factor(polygon))
           } else {
-            plot.data.spp = plot.data.spp %>%
+            plot.data.spp <- plot.data.spp %>%
               dplyr::mutate(polygon = as.factor(polygon))
           }
 
-          plot.data.ls[[r]] = boxes %>%
+          plot.data.ls[[r]] <- boxes %>%
             dplyr::left_join(plot.data.spp, by = 'polygon')
         }
-        plot.data = dplyr::bind_rows(plot.data.ls)
+        plot.data <- dplyr::bind_rows(plot.data.ls)
 
-        plot.spp.ls = list()
+        plot.spp.ls <- list()
         #1: Maps of ref values
-        p1 = ggplot2::ggplot(
+        p1 <- ggplot2::ggplot(
           ref.data.box,
           ggplot2::aes(x = long, y = lat, group = polygon, fill = ref.value)
         ) +
@@ -451,7 +451,7 @@ compare_spatial_vars = function(
           )
 
         #2: Map of init values
-        p2 = ggplot2::ggplot(
+        p2 <- ggplot2::ggplot(
           init.data.box,
           ggplot2::aes(x = long, y = lat, group = polygon, fill = init.value)
         ) +
@@ -469,7 +469,7 @@ compare_spatial_vars = function(
 
         #3: Maps of run values
 
-        p3 = ggplot2::ggplot(
+        p3 <- ggplot2::ggplot(
           plot.data,
           ggplot2::aes(x = long, y = lat, group = polygon, fill = model.val)
         ) +
@@ -487,7 +487,7 @@ compare_spatial_vars = function(
           )
 
         #4: Maps of comparisons between runs and ref values
-        p4 = ggplot2::ggplot(
+        p4 <- ggplot2::ggplot(
           plot.data,
           ggplot2::aes(x = long, y = lat, group = polygon, fill = compare.val)
         ) +
@@ -505,8 +505,8 @@ compare_spatial_vars = function(
             plot.title = ggplot2::element_text(hjust = 0.5)
           )
 
-        spp.match = fgs$Code[which(fgs$LongName == fleet.combs$species[sf])]
-        plot.name = paste0(
+        spp.match <- fgs$Code[which(fgs$LongName == fleet.combs$species[sf])]
+        plot.name <- paste0(
           fleet.combs$fleet[sf],
           ':',
           fleet.combs$species[sf],
@@ -517,7 +517,7 @@ compare_spatial_vars = function(
           ' ',
           data.type
         )
-        plot.layout = matrix(
+        plot.layout <- matrix(
           c(
             1,
             1,

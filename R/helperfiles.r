@@ -18,15 +18,15 @@ run.filename <- function(command, code) {
 
 
 #Utility function
-bind.save = function(x, name, out.dir) {
-  x2 = dplyr::bind_rows(x)
+bind.save <- function(x, name, out.dir) {
+  x2 <- dplyr::bind_rows(x)
   saveRDS(x2, file.path(out.dir, paste0(name, '.rds')))
 }
 
 
 #Utility function
-add.title = function(p, title) {
-  p = p +
+add.title <- function(p, title) {
+  p <- p +
     ggplot2::ggtitle(title) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
   return(p)

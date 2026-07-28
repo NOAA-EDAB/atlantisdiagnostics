@@ -80,9 +80,9 @@ diag_maxsize <- function(
 
   # list of variables to pull from main nc file.
   # Needed for biomass calculation. Each variable resides in list element
-  vars = list('Nums', 'StructN', 'ResN', 'N')
-  group.types = list(groups.age, groups.age, groups.age, groups.bp)
-  rawdata.main = Map(
+  vars <- list('Nums', 'StructN', 'ResN', 'N')
+  group.types <- list(groups.age, groups.age, groups.age, groups.bp)
+  rawdata.main <- Map(
     atlantistools::load_nc,
     select_variable = vars,
     select_groups = group.types,
@@ -96,7 +96,7 @@ diag_maxsize <- function(
   )
 
   # calculate biomass for species,age, polygon, layer, time
-  spatial.biomass = atlantistools::calculate_biomass_spatial(
+  spatial.biomass <- atlantistools::calculate_biomass_spatial(
     nums = rawdata.main[[1]],
     sn = rawdata.main[[2]],
     rn = rawdata.main[[3]],
@@ -106,7 +106,7 @@ diag_maxsize <- function(
     bps = bio.pools
   )
   # grab numbers in time and space
-  spatialNumbers = rawdata.main[[1]] %>%
+  spatialNumbers <- rawdata.main[[1]] %>%
     dplyr::rename(numbers = .data$atoutput)
   # filter biomass for species with 10 cohorts and convert to kilograms
   spatialBiomass <- spatial.biomass %>%

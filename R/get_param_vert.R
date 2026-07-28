@@ -39,7 +39,7 @@ get_param_vert <- function(bio.prm) {
   valuesD <- gsub("\t", " ", valuesD)
 
   # create a null dataframe
-  outdf = data.frame(
+  outdf <- data.frame(
     group = NULL,
     daynight = NULL,
     cohort = NULL,

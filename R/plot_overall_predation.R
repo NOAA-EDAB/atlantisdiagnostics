@@ -4,24 +4,24 @@
 # Gets total consumption for all groups -----------------------------------
 
 get_consumption <- function(prod.file, fgs.file) {
-  prod.nc = ncdf4::nc_open(prod.file)
-  prod.vars = names(prod.nc$var)
-  groups = read.csv(fgs.file, as.is = T)
-  time.vals = as.Date(as.POSIXct(
+  prod.nc <- ncdf4::nc_open(prod.file)
+  prod.vars <- names(prod.nc$var)
+  groups <- read.csv(fgs.file, as.is = T)
+  time.vals <- as.Date(as.POSIXct(
     prod.nc$dim$t$vals,
     origin = '1964-01-01 00:00:00',
     tz = 'UTC'
   ))
-  time.days = as.numeric(difftime(
+  time.days <- as.numeric(difftime(
     time.vals,
     as.Date('1964-01-01'),
     units = 'd'
   ))
 
-  consumption.all.ls = list()
+  consumption.all.ls <- list()
   for (i in 1:nrow(groups)) {
-    prod.vars.group = prod.vars[grep(groups$Name[i], prod.vars)]
-    group.eat = prod.vars.group[c(
+    prod.vars.group <- prod.vars[grep(groups$Name[i], prod.vars)]
+    group.eat <- prod.vars.group[c(
       grep('Eat', prod.vars.group),
       grep('Grazing', prod.vars.group)
     )]
@@ -29,16 +29,16 @@ get_consumption <- function(prod.file, fgs.file) {
     if (length(group.eat) == 0) {
       next()
     }
-    group.df.ls = list()
+    group.df.ls <- list()
     for (v in 1:length(group.eat)) {
-      age.var = colSums(ncdf4::ncvar_get(prod.nc, group.eat[v]))
+      age.var <- colSums(ncdf4::ncvar_get(prod.nc, group.eat[v]))
       if (grepl('_Eat', group.eat[v])) {
-        group.cohort = as.numeric(strsplit(
+        group.cohort <- as.numeric(strsplit(
           group.eat[v],
           paste0(groups$Name[i], '|_Eat')
         )[[1]][2]) -
           1
-        group.df.ls[[v]] = data.frame(
+        group.df.ls[[v]] <- data.frame(
           Predator = groups$Code[i],
           Cohort = group.cohort,
           Time = time.days,
@@ -47,7 +47,7 @@ get_consumption <- function(prod.file, fgs.file) {
           stringsAsFactors = F
         )
       } else {
-        group.df.ls[[v]] = data.frame(
+        group.df.ls[[v]] <- data.frame(
           Predator = groups$Code[i],
           Cohort = 0,
           Time = time.days,
@@ -57,9 +57,9 @@ get_consumption <- function(prod.file, fgs.file) {
         )
       }
     }
-    consumption.all.ls[[i]] = do.call('rbind', group.df.ls)
+    consumption.all.ls[[i]] <- do.call('rbind', group.df.ls)
   }
-  consumption.all = do.call('rbind', consumption.all.ls)
+  consumption.all <- do.call('rbind', consumption.all.ls)
   return(consumption.all)
 }
 
@@ -68,10 +68,10 @@ get_consumption <- function(prod.file, fgs.file) {
 #Reads in diet data, transforms to longform, adds total consumption, and subsets
 
 subset_diet <- function(diet.file, consumption, spp.names) {
-  data = data.table::fread(diet.file) %>%
+  data <- data.table::fread(diet.file) %>%
     dplyr::select(-Stock, -Updated)
   #Convert Data to long format
-  data.long = reshape2::melt(
+  data.long <- reshape2::melt(
     data,
     id.vars = c('Time', 'Predator', 'Cohort'),
     variable.name = 'Prey',
@@ -102,11 +102,11 @@ plot_overall_predation <- function(
   file.prefix
 ) {
   #Collapse small contributors into "Rest"
-  data.tot = data %>%
+  data.tot <- data %>%
     dplyr::group_by(Time, date, Prey) %>%
     dplyr::summarize(consumed.tot = sum(consumed.prey, na.rm = T))
 
-  data.new = data %>%
+  data.new <- data %>%
     dplyr::left_join(data.tot) %>%
     # dplyr::group_by(Time,date,Prey,Predator) %>%
     dplyr::mutate(
@@ -114,14 +114,14 @@ plot_overall_predation <- function(
       less.min = consumed.pct < min.fract
     )
 
-  data.small.pct = data.new %>%
+  data.small.pct <- data.new %>%
     dplyr::filter(less.min == T) %>%
     dplyr::group_by(Time, date, Prey) %>%
     dplyr::summarize(consumed.pct = sum(consumed.pct)) %>%
     dplyr::mutate(Predator = 'Rest') %>%
     dplyr::arrange(Time, Prey, Predator, consumed.pct)
 
-  data.final = data.new %>%
+  data.final <- data.new %>%
     dplyr::filter(less.min == F) %>%
     dplyr::select(-less.min) %>%
     dplyr::bind_rows(data.small.pct) %>%
@@ -134,87 +134,87 @@ plot_overall_predation <- function(
     )
 
   #Get Biomass Data
-  biomass.data = read.table(bioindex.file, header = T, stringsAsFactors = F)
-  biomass.colnames = colnames(biomass.data)
+  biomass.data <- read.table(bioindex.file, header = T, stringsAsFactors = F)
+  biomass.colnames <- colnames(biomass.data)
 
   #Get catch Data
   if (file.exists(catch.file)) {
-    catch.data = read.table(catch.file, header = T, stringsAsFactors = F)
-    catch.colnames = colnames(catch.data)
+    catch.data <- read.table(catch.file, header = T, stringsAsFactors = F)
+    catch.colnames <- colnames(catch.data)
   } else {
-    catch.data = NULL
-    catch.colnames = NULL
+    catch.data <- NULL
+    catch.colnames <- NULL
   }
 
   #Loop through species
-  plot.cols = c(
+  plot.cols <- c(
     RColorBrewer::brewer.pal(12, 'Set3'),
     RColorBrewer::brewer.pal(8, 'Dark2'),
     RColorBrewer::brewer.pal(8, 'Set2'),
     RColorBrewer::brewer.pal(9, 'Set1')
   )
 
-  plot.spp = sort(unique(as.character(data.new$Prey)))
+  plot.spp <- sort(unique(as.character(data.new$Prey)))
 
-  filename = file.path(fig.dir, paste0(file.prefix, '_TotalConsumption.pdf'))
+  filename <- file.path(fig.dir, paste0(file.prefix, '_TotalConsumption.pdf'))
   pdf(file = filename, width = 16, height = 8, onefile = T)
 
   for (i in 1:length(plot.spp)) {
-    data.spp = dplyr::filter(data.final, Prey == plot.spp[i])
+    data.spp <- dplyr::filter(data.final, Prey == plot.spp[i])
 
     #Identify all groups who have zero consumption values across all times/box/layers
-    which.zero = data.spp %>%
+    which.zero <- data.spp %>%
       dplyr::group_by(Predator) %>%
       dplyr::summarize(tot = sum(consumed.pct, na.rm = T)) %>%
       dplyr::mutate(all.zero = ifelse(tot == 0, T, F)) %>%
       dplyr::filter(all.zero == T)
-    which.zero = as.character(which.zero$Predator)
+    which.zero <- as.character(which.zero$Predator)
 
     #Remove zero consumption spp
-    data.spp = data.spp %>%
+    data.spp <- data.spp %>%
       dplyr::filter(!(Predator %in% which.zero))
 
     #Total consumption
-    data.tot.spp = data.tot %>%
+    data.tot.spp <- data.tot %>%
       dplyr::filter(Prey == plot.spp[i])
 
     #Biomass Timeseries
-    biomass.spp = biomass.data[, c(
+    biomass.spp <- biomass.data[, c(
       1,
       grep(paste0('\\b', plot.spp[i], '\\b'), biomass.colnames)
     )]
-    colnames(biomass.spp)[2] = 'value'
-    biomass.spp$Metric = 'biomass'
-    biomass.spp$date = as.POSIXct(
+    colnames(biomass.spp)[2] <- 'value'
+    biomass.spp$Metric <- 'biomass'
+    biomass.spp$date <- as.POSIXct(
       biomass.spp$Time * 86400,
       origin = '1964-01-01 00:00:00',
       tz = 'UTC'
     )
 
     #Catch Timeseries
-    catch.match = grep(paste0('\\b', plot.spp[i], '\\b'), catch.colnames)
+    catch.match <- grep(paste0('\\b', plot.spp[i], '\\b'), catch.colnames)
     if (length(catch.match) == 0) {
-      dum.dat = biomass.spp
-      dum.dat$value = NA
-      dum.dat$Metric = 'catch'
-      bio.catch.data = rbind(biomass.spp, dum.dat)
+      dum.dat <- biomass.spp
+      dum.dat$value <- NA
+      dum.dat$Metric <- 'catch'
+      bio.catch.data <- rbind(biomass.spp, dum.dat)
     } else {
-      catch.spp = catch.data[, c(1, catch.match)]
-      colnames(catch.spp)[2] = 'value'
-      catch.spp$Metric = 'catch'
-      catch.spp$date = as.POSIXct(
+      catch.spp <- catch.data[, c(1, catch.match)]
+      colnames(catch.spp)[2] <- 'value'
+      catch.spp$Metric <- 'catch'
+      catch.spp$date <- as.POSIXct(
         catch.spp$Time * 86400,
         origin = '1964-01-01 00:00:00',
         tz = 'UTC'
       )
 
       #Combine Bio Catch
-      bio.catch.data = rbind(biomass.spp, catch.spp)
+      bio.catch.data <- rbind(biomass.spp, catch.spp)
     }
 
     #Plot prey
 
-    f1 = ggplot2::ggplot(
+    f1 <- ggplot2::ggplot(
       data.spp,
       ggplot2::aes(x = date, y = consumed.pct, fill = Predator)
     ) +
@@ -228,7 +228,7 @@ plot_overall_predation <- function(
       ggplot2::guides(fill = ggplot2::guide_legend(nrow = 1)) +
       ggplot2::theme(legend.position = 'bottom')
 
-    f2 = ggplot2::ggplot(
+    f2 <- ggplot2::ggplot(
       data.tot.spp,
       ggplot2::aes(x = date, y = consumed.tot),
       size = 1.5
@@ -238,7 +238,7 @@ plot_overall_predation <- function(
       ggplot2::ylab('Total consumption (mg N m-3 d-1)') +
       ggplot2::theme_classic()
 
-    f3 = ggplot2::ggplot(
+    f3 <- ggplot2::ggplot(
       bio.catch.data,
       ggplot2::aes(x = date, y = value, lty = Metric)
     ) +
