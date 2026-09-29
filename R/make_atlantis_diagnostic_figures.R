@@ -36,7 +36,7 @@
 #'@param plot.weight logical. Plots the maximum size of fish in each size class over the domain
 #'@param plot.mortality logical. Plots Mortality (F, M1, M2) from two output sources (Mort, SpecificMort)
 #'
-#'@importFrom magrittr "%>%"
+#'@importFrom magrittr "|>"
 #'
 #'@return A series of figures and tables based on output grouping flags
 #'
@@ -136,7 +136,11 @@ make_atlantis_diagnostic_figures <- function(
 
   if (plot.catch | plot.all) {
     print("Catch")
-    catchmt <- readRDS(file.path(out.dir, 'catchmt.rds'))
+    catchmt <- readRDS(file.path(out.dir, 'totcatch.rds')) |> 
+      dplyr::filter(units == 'mt') |> 
+      dplyr::mutate(time = floor(time/365)) |> 
+      dplyr::group_by(species,time) |> 
+      dplyr::summarise(atoutput = sum(atoutput,na.rm=T))
 
     #Catch by species time series (metric tonnes)
     temp.plot.1 <- atlantistools::plot_line(catchmt)
@@ -149,7 +153,12 @@ make_atlantis_diagnostic_figures <- function(
 
     #Catch at age time series (numbers)
 
-    totcatch <- readRDS(file.path(out.dir, 'totcatch.rds'))
+    totcatch <- readRDS(file.path(out.dir, 'totcatch.rds')) |> 
+      dplyr::filter(!is.na(agecl)) |>
+      dplyr::filter(units == 'numbers') |> 
+      dplyr::mutate(time = floor(time/365)) |> 
+      dplyr::group_by(species,time,agecl) |> 
+      dplyr::summarise(atoutput = sum(atoutput,na.rm=T))
 
     temp.plot.2 <- atlantistools::plot_line(totcatch, col = 'agecl')
     temp.plot.2 <- ggplot2::update_labels(
@@ -215,7 +224,7 @@ make_atlantis_diagnostic_figures <- function(
     # plot absolute mortality. 3 pages, one page for F,M1,M2
     for (atype in rev(unique(specificmort$mort))) {
       itype <- itype + 1
-      mort <- specificmort %>%
+      mort <- specificmort |>
         dplyr::filter(mort == atype)
       temp.plot <- atlantistools::plot_line(mort, col = 'agecl')
       temp.plot <- ggplot2::update_labels(
@@ -246,8 +255,8 @@ make_atlantis_diagnostic_figures <- function(
     # plot relative mortality by age class
     # select species with 10 age classes
     for (iage in 1:max(specificmort$agecl)) {
-      mortality <- specificmort %>%
-        dplyr::filter(code %in% allCodes) %>%
+      mortality <- specificmort |>
+        dplyr::filter(code %in% allCodes) |>
         dplyr::filter(agecl == iage)
 
       pct <- atlantistools::agg_perc(mortality, groups = c('time', 'species'))
@@ -273,14 +282,14 @@ make_atlantis_diagnostic_figures <- function(
 
     # select species with 2 age classes
     for (i2age in 1:2) {
-      mortality <- specificmort %>%
+      mortality <- specificmort |>
         dplyr::filter(
           code %in%
             atlantistools::get_cohorts_acronyms(
               param.ls$groups.file,
               numCohorts = 2
             )
-        ) %>%
+        ) |>
         dplyr::filter(agecl == i2age)
 
       pct <- atlantistools::agg_perc(mortality, groups = c('time', 'species'))
@@ -305,14 +314,14 @@ make_atlantis_diagnostic_figures <- function(
     }
 
     # select species with 1 age classes (Biomass pool)
-    mortality <- specificmort %>%
+    mortality <- specificmort |>
       dplyr::filter(
         code %in%
           atlantistools::get_cohorts_acronyms(
             param.ls$groups.file,
             numCohorts = 1
           )
-      ) %>%
+      ) |>
       dplyr::filter(agecl == 1)
 
     pct <- atlantistools::agg_perc(mortality, groups = c('time', 'species'))
@@ -487,8 +496,8 @@ make_atlantis_diagnostic_figures <- function(
       file.path(param.dir, 'vertebrate_init_length_cm_Adjusted.csv'),
       header = T,
       stringsAsFactors = F
-    ) %>%
-      dplyr::select(Code, species, agecl, new.length.ref) %>%
+    ) |>
+      dplyr::select(Code, species, agecl, new.length.ref) |>
       tidyr::spread(agecl, new.length.ref)
     init.length <- init.length[order(init.length$species), ]
     spp.names <- unique(length.age$species)
@@ -559,9 +568,9 @@ make_atlantis_diagnostic_figures <- function(
     print("max weight")
     maxSize <- readRDS(file.path(out.dir, 'max_weight.rds'))
     ageClasses <- 1:max(maxSize$agecl)
-    maxSize <- maxSize %>%
-      dplyr::group_by(species, agecl) %>%
-      dplyr::summarize(mm = max(maxMeanWeight) / 1000, .groups = "drop") %>% # convert to kilograms
+    maxSize <- maxSize |>
+      dplyr::group_by(species, agecl) |>
+      dplyr::summarize(mm = max(maxMeanWeight) / 1000, .groups = "drop") |> # convert to kilograms
       dplyr::mutate(agecl = as.factor(agecl))
 
     weight.plot <- atlantistools:::custom_map(
@@ -671,8 +680,8 @@ make_atlantis_diagnostic_figures <- function(
   #     #Used to scale mum and C
   #     match.id = which(!(init.length$species %in% length.age.mn$species))
   #     init.length = init.length[-match.id,]
-  #     init.length = init.length %>%
-  #       dplyr::select(species,agecl,new.length.ref) %>%
+  #     init.length = init.length |>
+  #       dplyr::select(species,agecl,new.length.ref) |>
   #       tidyr::spread(agecl,new.length.ref)
   #
   #     length.v.length.init = length.age.mn[,2:ncol(length.age.mn)]/init.length[,2:ncol(init.length)]
@@ -823,12 +832,12 @@ make_atlantis_diagnostic_figures <- function(
     temp.plot.4 <- add.title(temp.plot.4, 'RN vs RN Init')
 
     #SN/RN domain-wide
-    RN.SN <- SN.box %>%
-      dplyr::rename('SN' = atoutput) %>%
-      dplyr::left_join(RN.box, by = c("species", "polygon", "time")) %>%
-      dplyr::rename('RN' = atoutput) %>%
-      dplyr::group_by(species, time) %>%
-      dplyr::summarize(SN = sum(SN, na.rm = T), RN = sum(RN, na.rm = T)) %>%
+    RN.SN <- SN.box |>
+      dplyr::rename('SN' = atoutput) |>
+      dplyr::left_join(RN.box, by = c("species", "polygon", "time")) |>
+      dplyr::rename('RN' = atoutput) |>
+      dplyr::group_by(species, time) |>
+      dplyr::summarize(SN = sum(SN, na.rm = T), RN = sum(RN, na.rm = T)) |>
       dplyr::mutate(RN.SN = RN / SN)
 
     temp.plot.5 <- ggplot2::ggplot(RN.SN, ggplot2::aes(x = time, y = RN.SN)) +
@@ -1445,26 +1454,27 @@ make_atlantis_diagnostic_figures <- function(
     print("spatial catch")
     bgm <- atlantistools::convert_bgm(bgm = param.ls$bgm)
 
-    biomass.box <- readRDS(file.path(out.dir, 'biomass_box.rds')) %>%
-      dplyr::filter(time >= (max(time) - 10)) %>%
-      dplyr::group_by(species, polygon) %>%
+    biomass.box <- readRDS(file.path(out.dir, 'biomass_box.rds')) |>
+      dplyr::filter(time >= (max(time) - 10)) |>
+      dplyr::group_by(species, polygon) |>
       dplyr::summarise(biomass = mean(atoutput, na.rm = T))
 
-    catch <- readRDS(file.path(out.dir, 'catch.rds')) %>%
-      dplyr::filter(time >= (max(time) - 10)) %>%
-      dplyr::group_by(species, polygon) %>%
+    catch <- readRDS(file.path(out.dir, 'catch.rds')) |>
+      dplyr::filter(time >= (max(time) - 10) & units == 'mt') |>
+      dplyr::mutate(polygon = as.numeric(polygon)) |> 
+      dplyr::group_by(species, polygon) |>
       dplyr::summarise(catch = mean(atoutput, na.rm = T))
 
-    biomass.catch.box <- biomass.box %>%
+    biomass.catch.box <- biomass.box |>
       dplyr::left_join(catch)
 
     i <- 1
     pdf(paste0(fig.dir, '/spatial_biomass_catch.pdf'))
     for (i in 1:nrow(group.index)) {
-      biomass.catch.spp <- biomass.catch.box %>%
+      biomass.catch.spp <- biomass.catch.box |>
         dplyr::filter(species == group.index$LongName[i])
 
-      biomass.catch.spp.polygon <- bgm %>%
+      biomass.catch.spp.polygon <- bgm |>
         dplyr::left_join(biomass.catch.spp)
 
       p1 <- ggplot2::ggplot(
