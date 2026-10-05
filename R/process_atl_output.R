@@ -1231,7 +1231,7 @@ process_atl_output <- function(
     catch.names.parsed <- data.frame(varname = catch.vars.all) |>
       tidyr::extract(
         col = varname,
-        into = c('species','agecl','catch.var','fleet'),
+        into = c('species', 'agecl', 'catch.var', 'fleet'),
         regex = "^([A-Za-z_]+?)(\\d*)_([A-Za-z]+)(?:_[A-Za-z]*(\\d+))?$",
         remove = F,
         convert = T
