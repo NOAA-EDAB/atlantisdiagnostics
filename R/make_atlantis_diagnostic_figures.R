@@ -153,7 +153,7 @@ make_atlantis_diagnostic_figures <- function(
 
     #Catch at age time series (numbers)
 
-    totcatch <- readRDS(file.path(out.dir, 'totcatch.rds')) |> 
+    totcatch <- readRDS(file.path(out.dir, 'totcatch.rds')) |>
       dplyr::filter(!is.na(agecl)) |>
       dplyr::filter(units == 'numbers') |> 
       dplyr::mutate(time = floor(time/365)) |> 
