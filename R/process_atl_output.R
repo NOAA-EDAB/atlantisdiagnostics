@@ -1248,10 +1248,11 @@ process_atl_output <- function(
         units = dplyr::case_when(
           catch.var == 'Catch' & fleet == 0 ~ 'numbers',
           catch.var == 'Catch' & fleet != 0 ~ 'mt',
-          catch.var == 'Discards' ~ 'numbers'),
-        )
-    
-    # 1. Pre-allocate your coordinate template ONCE. 
+          catch.var == 'Discards' ~ 'numbers'
+        ),
+      )
+
+    # 1. Pre-allocate your coordinate template ONCE.
     n_poly <- length(catch.nc.box)
     n_time <- length(catch.nc.time)
     
