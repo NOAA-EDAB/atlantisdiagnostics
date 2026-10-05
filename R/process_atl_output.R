@@ -1274,8 +1274,8 @@ process_atl_output <- function(
       }
       
       # Get data
-      this.dat = ncdf4::ncvar_get(catch.nc, this.var)  
-      
+      this.dat <- ncdf4::ncvar_get(catch.nc, this.var)
+
       # 3. Fast assembly: Copy template, unroll matrix instantly with as.vector()
       this.dat.long <- template_df
       this.dat.long$value <- as.vector(this.dat)
