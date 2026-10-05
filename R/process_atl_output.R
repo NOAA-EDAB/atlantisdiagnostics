@@ -1235,7 +1235,7 @@ process_atl_output <- function(
         regex = "^([A-Za-z_]+?)(\\d*)_([A-Za-z]+)(?:_[A-Za-z]*(\\d+))?$",
         remove = F,
         convert = T
-      ) |> 
+      ) |>
       dplyr::mutate(
         catch.var = dplyr::case_when(
           catch.var == 'Discard' ~ 'Discards',
