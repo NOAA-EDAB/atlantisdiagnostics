@@ -1257,7 +1257,7 @@ process_atl_output <- function(
     n_time <- length(catch.nc.time)
     template_df <- tibble::tibble(
       polygon = rep(as.character(catch.nc.box), times = n_time),
-      time    = rep(catch.nc.time, each = n_poly)
+      time = rep(catch.nc.time, each = n_poly)
     )
     
     # 2. Pre-allocate list to correct size (saves memory reallocation overhead)
