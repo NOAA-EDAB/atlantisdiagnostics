@@ -1239,7 +1239,8 @@ process_atl_output <- function(
       dplyr::mutate(
         catch.var = dplyr::case_when(
           catch.var == 'Discard' ~ 'Discards',
-          TRUE ~ catch.var),
+          TRUE ~ catch.var
+        ),
         fleet = dplyr::case_when(
           is.na(fleet) ~ 0,
           TRUE ~ fleet),
