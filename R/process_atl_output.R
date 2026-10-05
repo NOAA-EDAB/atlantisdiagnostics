@@ -1267,10 +1267,10 @@ process_atl_output <- function(
       this.species <- catch.names.parsed$species[i]
 
       # match species (added [1] just in case of multiple matches)
-      if( this.species %in% fgs$Code){
-        this.longname = fgs$LongName[fgs$Code == this.species][1]
-      }else{
-        this.longname = fgs$LongName[fgs$Name == this.species][1]
+      if (this.species %in% fgs$Code) {
+        this.longname <- fgs$LongName[fgs$Code == this.species][1]
+      } else {
+        this.longname <- fgs$LongName[fgs$Name == this.species][1]
       }
       # Get data
       this.dat <- ncdf4::ncvar_get(catch.nc, this.var)
