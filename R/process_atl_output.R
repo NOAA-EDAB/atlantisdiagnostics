@@ -1214,21 +1214,21 @@ process_atl_output <- function(
     #   bboxes = bboxes,
     #   check_acronyms = F
     # )
-    
-    catch.nc = ncdf4::nc_open(param.ls$catch)
-    
-    catch.nc.time = catch.nc$dim$t$vals/86400
-    catch.nc.year = floor(catch.nc.time/365)
-    
-    catch.nc.box = catch.nc$dim$b$vals-1
-    
-    catch.nc.names = names(catch.nc$var)
-    fleet.vars = grep('FC',catch.nc.names,value =T)
-    catch.vars = grep('Catch$',catch.nc.names,value =  T)
-    disc.vars = grep('Discards$',catch.nc.names, value =T)
-    catch.vars.all = c(fleet.vars,catch.vars,disc.vars)
-    
-    catch.names.parsed = data.frame(varname = catch.vars.all) |> 
+
+    catch.nc <- ncdf4::nc_open(param.ls$catch)
+
+    catch.nc.time <- catch.nc$dim$t$vals / 86400
+    catch.nc.year <- floor(catch.nc.time / 365)
+
+    catch.nc.box <- catch.nc$dim$b$vals - 1
+
+    catch.nc.names <- names(catch.nc$var)
+    fleet.vars <- grep('FC', catch.nc.names, value = T)
+    catch.vars <- grep('Catch$', catch.nc.names, value = T)
+    disc.vars <- grep('Discards$', catch.nc.names, value = T)
+    catch.vars.all <- c(fleet.vars, catch.vars, disc.vars)
+
+    catch.names.parsed <- data.frame(varname = catch.vars.all) |>
       tidyr::extract(
         col = varname,
         into = c('species','agecl','catch.var','fleet'),
