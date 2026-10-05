@@ -1272,7 +1272,6 @@ process_atl_output <- function(
       }else{
         this.longname = fgs$LongName[fgs$Name == this.species][1]
       }
-      
       # Get data
       this.dat <- ncdf4::ncvar_get(catch.nc, this.var)
 
