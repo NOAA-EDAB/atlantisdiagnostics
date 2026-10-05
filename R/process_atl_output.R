@@ -1243,7 +1243,8 @@ process_atl_output <- function(
         ),
         fleet = dplyr::case_when(
           is.na(fleet) ~ 0,
-          TRUE ~ fleet),
+          TRUE ~ fleet
+        ),
         units = dplyr::case_when(
           catch.var == 'Catch' & fleet == 0 ~ 'numbers',
           catch.var == 'Catch' & fleet != 0 ~ 'mt',
