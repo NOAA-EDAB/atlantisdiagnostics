@@ -1259,7 +1259,6 @@ process_atl_output <- function(
       polygon = rep(as.character(catch.nc.box), times = n_time),
       time = rep(catch.nc.time, each = n_poly)
     )
-    
     # 2. Pre-allocate list to correct size (saves memory reallocation overhead)
     catch.out.ls = vector("list", nrow(catch.names.parsed)) 
     
