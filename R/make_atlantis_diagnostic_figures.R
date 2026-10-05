@@ -155,10 +155,10 @@ make_atlantis_diagnostic_figures <- function(
 
     totcatch <- readRDS(file.path(out.dir, 'totcatch.rds')) |>
       dplyr::filter(!is.na(agecl)) |>
-      dplyr::filter(units == 'numbers') |> 
-      dplyr::mutate(time = floor(time/365)) |> 
-      dplyr::group_by(species,time,agecl) |> 
-      dplyr::summarise(atoutput = sum(atoutput,na.rm=T))
+      dplyr::filter(units == 'numbers') |>
+      dplyr::mutate(time = floor(time / 365)) |>
+      dplyr::group_by(species, time, agecl) |>
+      dplyr::summarise(atoutput = sum(atoutput, na.rm = T))
 
     temp.plot.2 <- atlantistools::plot_line(totcatch, col = 'agecl')
     temp.plot.2 <- ggplot2::update_labels(
