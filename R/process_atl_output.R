@@ -1278,7 +1278,7 @@ process_atl_output <- function(
       
       # 3. Fast assembly: Copy template, unroll matrix instantly with as.vector()
       this.dat.long <- template_df
-      this.dat.long$value <- as.vector(this.dat) 
+      this.dat.long$value <- as.vector(this.dat)
       this.dat.long$species <- this.longname
       this.dat.long$varname <- this.var
       
