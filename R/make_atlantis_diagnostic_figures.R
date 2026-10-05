@@ -1461,7 +1461,7 @@ make_atlantis_diagnostic_figures <- function(
 
     catch <- readRDS(file.path(out.dir, 'catch.rds')) |>
       dplyr::filter(time >= (max(time) - 10) & units == 'mt') |>
-      dplyr::mutate(polygon = as.numeric(polygon)) |> 
+      dplyr::mutate(polygon = as.numeric(polygon)) |>
       dplyr::group_by(species, polygon) |>
       dplyr::summarise(catch = mean(atoutput, na.rm = T))
 
