@@ -36,7 +36,6 @@
 #'@param plot.weight logical. Plots the maximum size of fish in each size class over the domain
 #'@param plot.mortality logical. Plots Mortality (F, M1, M2) from two output sources (Mort, SpecificMort)
 #'
-#'@importFrom magrittr "|>"
 #'
 #'@return A series of figures and tables based on output grouping flags
 #'
