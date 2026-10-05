@@ -1284,16 +1284,15 @@ process_atl_output <- function(
 
       catch.out.ls[[i]] <- this.dat.long
     }
-    
-    catch = dplyr::bind_rows(catch.out.ls) |> 
-      dplyr::left_join(catch.names.parsed, by = 'varname') |> 
-      dplyr::select(-species.y) |> 
-      dplyr::rename(species = 'species.x',
-                    atoutput = 'value')
-     # x= filter(catch, species == 'Acadian redfish'  & catch.var == 'Catch' & units == 'numbers')
-    totcatch  = catch |> 
-      dplyr::group_by(species,fleet,time,agecl,units) |> 
-      dplyr::summarise(atoutput = sum(atoutput,na.rm=T))
+
+    catch <- dplyr::bind_rows(catch.out.ls) |>
+      dplyr::left_join(catch.names.parsed, by = 'varname') |>
+      dplyr::select(-species.y) |>
+      dplyr::rename(species = 'species.x', atoutput = 'value')
+    # x= filter(catch, species == 'Acadian redfish'  & catch.var == 'Catch' & units == 'numbers')
+    totcatch <- catch |>
+      dplyr::group_by(species, fleet, time, agecl, units) |>
+      dplyr::summarise(atoutput = sum(atoutput, na.rm = T))
 
     # catchmt <- atlantisom::load_catch(
     #   dir = atl.dir,
