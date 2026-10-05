@@ -1281,8 +1281,8 @@ process_atl_output <- function(
       this.dat.long$value <- as.vector(this.dat)
       this.dat.long$species <- this.longname
       this.dat.long$varname <- this.var
-      
-      catch.out.ls[[i]] = this.dat.long   
+
+      catch.out.ls[[i]] <- this.dat.long
     }
     
     catch = dplyr::bind_rows(catch.out.ls) |> 
