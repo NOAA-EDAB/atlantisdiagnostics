@@ -1255,7 +1255,6 @@ process_atl_output <- function(
     # 1. Pre-allocate your coordinate template ONCE.
     n_poly <- length(catch.nc.box)
     n_time <- length(catch.nc.time)
-    
     template_df <- tibble::tibble(
       polygon = rep(as.character(catch.nc.box), times = n_time),
       time    = rep(catch.nc.time, each = n_poly)
