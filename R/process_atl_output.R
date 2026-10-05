@@ -1260,13 +1260,12 @@ process_atl_output <- function(
       time = rep(catch.nc.time, each = n_poly)
     )
     # 2. Pre-allocate list to correct size (saves memory reallocation overhead)
-    catch.out.ls = vector("list", nrow(catch.names.parsed)) 
-    
-    for(i in seq_len(nrow(catch.names.parsed))){
-      
-      this.var = catch.names.parsed$varname[i]
-      this.species = catch.names.parsed$species[i]
-      
+    catch.out.ls <- vector("list", nrow(catch.names.parsed))
+
+    for (i in seq_len(nrow(catch.names.parsed))) {
+      this.var <- catch.names.parsed$varname[i]
+      this.species <- catch.names.parsed$species[i]
+
       # match species (added [1] just in case of multiple matches)
       if( this.species %in% fgs$Code){
         this.longname = fgs$LongName[fgs$Code == this.species][1]
