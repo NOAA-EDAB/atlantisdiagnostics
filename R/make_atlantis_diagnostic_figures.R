@@ -136,11 +136,11 @@ make_atlantis_diagnostic_figures <- function(
 
   if (plot.catch | plot.all) {
     print("Catch")
-    catchmt <- readRDS(file.path(out.dir, 'totcatch.rds')) |> 
-      dplyr::filter(units == 'mt') |> 
-      dplyr::mutate(time = floor(time/365)) |> 
-      dplyr::group_by(species,time) |> 
-      dplyr::summarise(atoutput = sum(atoutput,na.rm=T))
+    catchmt <- readRDS(file.path(out.dir, 'totcatch.rds')) |>
+      dplyr::filter(units == 'mt') |>
+      dplyr::mutate(time = floor(time / 365)) |>
+      dplyr::group_by(species, time) |>
+      dplyr::summarise(atoutput = sum(atoutput, na.rm = T))
 
     #Catch by species time series (metric tonnes)
     temp.plot.1 <- atlantistools::plot_line(catchmt)
