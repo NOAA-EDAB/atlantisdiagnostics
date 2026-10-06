@@ -1255,12 +1255,18 @@ process_atl_output <- function(
     # 1. Pre-allocate your coordinate template ONCE.
     n_poly <- length(catch.nc.box)
     n_time <- length(catch.nc.time)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2720b2201d4a2e29d9af0f3413a3620e0e161ee0
     template_df <- tibble::tibble(
       polygon = rep(as.character(catch.nc.box), times = n_time),
       time = rep(catch.nc.time, each = n_poly)
     )
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2720b2201d4a2e29d9af0f3413a3620e0e161ee0
     # 2. Pre-allocate list to correct size (saves memory reallocation overhead)
     catch.out.ls <- vector("list", nrow(catch.names.parsed))
 
@@ -1274,7 +1280,10 @@ process_atl_output <- function(
       } else {
         this.longname <- fgs$LongName[fgs$Name == this.species][1]
       }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2720b2201d4a2e29d9af0f3413a3620e0e161ee0
       # Get data
       this.dat <- ncdf4::ncvar_get(catch.nc, this.var)
 
