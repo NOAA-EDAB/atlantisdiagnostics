@@ -1214,86 +1214,87 @@ process_atl_output <- function(
     #   bboxes = bboxes,
     #   check_acronyms = F
     # )
-    
-    catch.nc = ncdf4::nc_open(param.ls$catch)
-    
-    catch.nc.time = catch.nc$dim$t$vals/86400
-    catch.nc.year = floor(catch.nc.time/365)
-    
-    catch.nc.box = catch.nc$dim$b$vals-1
-    
-    catch.nc.names = names(catch.nc$var)
-    fleet.vars = grep('FC',catch.nc.names,value =T)
-    catch.vars = grep('Catch$',catch.nc.names,value =  T)
-    disc.vars = grep('Discards$',catch.nc.names, value =T)
-    catch.vars.all = c(fleet.vars,catch.vars,disc.vars)
-    
-    catch.names.parsed = data.frame(varname = catch.vars.all) |> 
+
+    catch.nc <- ncdf4::nc_open(param.ls$catch)
+
+    catch.nc.time <- catch.nc$dim$t$vals / 86400
+    catch.nc.year <- floor(catch.nc.time / 365)
+
+    catch.nc.box <- catch.nc$dim$b$vals - 1
+
+    catch.nc.names <- names(catch.nc$var)
+    fleet.vars <- grep('FC', catch.nc.names, value = T)
+    catch.vars <- grep('Catch$', catch.nc.names, value = T)
+    disc.vars <- grep('Discards$', catch.nc.names, value = T)
+    catch.vars.all <- c(fleet.vars, catch.vars, disc.vars)
+
+    catch.names.parsed <- data.frame(varname = catch.vars.all) |>
       tidyr::extract(
         col = varname,
-        into = c('species','agecl','catch.var','fleet'),
+        into = c('species', 'agecl', 'catch.var', 'fleet'),
         regex = "^([A-Za-z_]+?)(\\d*)_([A-Za-z]+)(?:_[A-Za-z]*(\\d+))?$",
         remove = F,
         convert = T
-      ) |> 
+      ) |>
       dplyr::mutate(
         catch.var = dplyr::case_when(
           catch.var == 'Discard' ~ 'Discards',
-          TRUE ~ catch.var),
+          TRUE ~ catch.var
+        ),
         fleet = dplyr::case_when(
           is.na(fleet) ~ 0,
-          TRUE ~ fleet),
+          TRUE ~ fleet
+        ),
         units = dplyr::case_when(
           catch.var == 'Catch' & fleet == 0 ~ 'numbers',
           catch.var == 'Catch' & fleet != 0 ~ 'mt',
-          catch.var == 'Discards' ~ 'numbers'),
-        )
-    
-    # 1. Pre-allocate your coordinate template ONCE. 
+          catch.var == 'Discards' ~ 'numbers'
+        ),
+      )
+
+    # 1. Pre-allocate your coordinate template ONCE.
     n_poly <- length(catch.nc.box)
     n_time <- length(catch.nc.time)
-    
+
     template_df <- tibble::tibble(
       polygon = rep(as.character(catch.nc.box), times = n_time),
-      time    = rep(catch.nc.time, each = n_poly)
+      time = rep(catch.nc.time, each = n_poly)
     )
-    
+
     # 2. Pre-allocate list to correct size (saves memory reallocation overhead)
-    catch.out.ls = vector("list", nrow(catch.names.parsed)) 
-    
-    for(i in seq_len(nrow(catch.names.parsed))){
-      
-      this.var = catch.names.parsed$varname[i]
-      this.species = catch.names.parsed$species[i]
-      
+    catch.out.ls <- vector("list", nrow(catch.names.parsed))
+
+    for (i in seq_len(nrow(catch.names.parsed))) {
+      this.var <- catch.names.parsed$varname[i]
+      this.species <- catch.names.parsed$species[i]
+
       # match species (added [1] just in case of multiple matches)
-      if( this.species %in% fgs$Code){
-        this.longname = fgs$LongName[fgs$Code == this.species][1]
-      }else{
-        this.longname = fgs$LongName[fgs$Name == this.species][1]
+      if (this.species %in% fgs$Code) {
+        this.longname <- fgs$LongName[fgs$Code == this.species][1]
+      } else {
+        this.longname <- fgs$LongName[fgs$Name == this.species][1]
       }
-      
+
       # Get data
-      this.dat = ncdf4::ncvar_get(catch.nc, this.var)  
-      
+      this.dat <- ncdf4::ncvar_get(catch.nc, this.var)
+
       # 3. Fast assembly: Copy template, unroll matrix instantly with as.vector()
       this.dat.long <- template_df
-      this.dat.long$value <- as.vector(this.dat) 
+      this.dat.long$value <- as.vector(this.dat)
       this.dat.long$species <- this.longname
       this.dat.long$varname <- this.var
-      
-      catch.out.ls[[i]] = this.dat.long   
+
+      catch.out.ls[[i]] <- this.dat.long
     }
-    
-    catch = dplyr::bind_rows(catch.out.ls) |> 
-      dplyr::left_join(catch.names.parsed, by = 'varname') |> 
-      dplyr::select(-species.y) |> 
-      dplyr::rename(species = 'species.x',
-                    atoutput = 'value')
-     # x= filter(catch, species == 'Acadian redfish'  & catch.var == 'Catch' & units == 'numbers')
-    totcatch  = catch |> 
-      dplyr::group_by(species,fleet,time,agecl,units) |> 
-      dplyr::summarise(atoutput = sum(atoutput,na.rm=T))
+
+    catch <- dplyr::bind_rows(catch.out.ls) |>
+      dplyr::left_join(catch.names.parsed, by = 'varname') |>
+      dplyr::select(-species.y) |>
+      dplyr::rename(species = 'species.x', atoutput = 'value')
+    # x= filter(catch, species == 'Acadian redfish'  & catch.var == 'Catch' & units == 'numbers')
+    totcatch <- catch |>
+      dplyr::group_by(species, fleet, time, agecl, units) |>
+      dplyr::summarise(atoutput = sum(atoutput, na.rm = T))
 
     # catchmt <- atlantisom::load_catch(
     #   dir = atl.dir,

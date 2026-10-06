@@ -136,11 +136,11 @@ make_atlantis_diagnostic_figures <- function(
 
   if (plot.catch | plot.all) {
     print("Catch")
-    catchmt <- readRDS(file.path(out.dir, 'totcatch.rds')) |> 
-      dplyr::filter(units == 'mt') |> 
-      dplyr::mutate(time = floor(time/365)) |> 
-      dplyr::group_by(species,time) |> 
-      dplyr::summarise(atoutput = sum(atoutput,na.rm=T))
+    catchmt <- readRDS(file.path(out.dir, 'totcatch.rds')) |>
+      dplyr::filter(units == 'mt') |>
+      dplyr::mutate(time = floor(time / 365)) |>
+      dplyr::group_by(species, time) |>
+      dplyr::summarise(atoutput = sum(atoutput, na.rm = T))
 
     #Catch by species time series (metric tonnes)
     temp.plot.1 <- atlantistools::plot_line(catchmt)
@@ -153,12 +153,12 @@ make_atlantis_diagnostic_figures <- function(
 
     #Catch at age time series (numbers)
 
-    totcatch <- readRDS(file.path(out.dir, 'totcatch.rds')) |> 
+    totcatch <- readRDS(file.path(out.dir, 'totcatch.rds')) |>
       dplyr::filter(!is.na(agecl)) |>
-      dplyr::filter(units == 'numbers') |> 
-      dplyr::mutate(time = floor(time/365)) |> 
-      dplyr::group_by(species,time,agecl) |> 
-      dplyr::summarise(atoutput = sum(atoutput,na.rm=T))
+      dplyr::filter(units == 'numbers') |>
+      dplyr::mutate(time = floor(time / 365)) |>
+      dplyr::group_by(species, time, agecl) |>
+      dplyr::summarise(atoutput = sum(atoutput, na.rm = T))
 
     temp.plot.2 <- atlantistools::plot_line(totcatch, col = 'agecl')
     temp.plot.2 <- ggplot2::update_labels(
@@ -1461,7 +1461,7 @@ make_atlantis_diagnostic_figures <- function(
 
     catch <- readRDS(file.path(out.dir, 'catch.rds')) |>
       dplyr::filter(time >= (max(time) - 10) & units == 'mt') |>
-      dplyr::mutate(polygon = as.numeric(polygon)) |> 
+      dplyr::mutate(polygon = as.numeric(polygon)) |>
       dplyr::group_by(species, polygon) |>
       dplyr::summarise(catch = mean(atoutput, na.rm = T))
 
